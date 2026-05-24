@@ -1,6 +1,11 @@
 import os
+import sys
 import json
 import time
+
+# Ensure root directory is in Python path for importing modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env
 from datetime import datetime, timedelta
