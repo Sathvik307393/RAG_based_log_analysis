@@ -303,8 +303,91 @@ st.markdown("""
         margin-bottom: 0.25rem;
         font-size: 0.85rem;
     }
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 179, 0, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 179, 0, 0); }
+    }
+    .dot-green {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #10b981;
+    }
+    .dot-red {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #ef4444;
+    }
+    .dot-yellow {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #ffb300;
+        animation: pulse 1.5s infinite;
+    }
+    .dot-grey {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #64748b;
+    }
+    .pipeline-container {
+        background: rgba(18, 22, 35, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .pipeline-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding-bottom: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .pipeline-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #ff5722;
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    .pipeline-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    .pipeline-job-card {
+        background: rgba(4, 7, 15, 0.5);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 6px;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    .pipeline-job-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        color: #f1f5f9;
+    }
+    .pipeline-job-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
 </style>
 """, unsafe_allow_html=True)
+
 
 # Local logs storage helpers
 
@@ -330,8 +413,245 @@ def append_local_logs(new_logs):
     save_local_logs(logs)
 
 # ─────────────────────────────────────────────
+#  GitHub Actions Status Checker & Mock Fallbacks
+# ─────────────────────────────────────────────
+def get_git_repo_info():
+    try:
+        git_config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".git", "config")
+        if os.path.exists(git_config_path):
+            with open(git_config_path, "r") as f:
+                content = f.read()
+            import re
+            match = re.search(r"url\s*=\s*(?:git@github\.com:|https://github\.com/)([^/\s]+)/([^/.\s]+)", content)
+            if match:
+                owner = match.group(1)
+                repo = match.group(2)
+                if repo.endswith(".git"):
+                    repo = repo[:-4]
+                return f"{owner}/{repo}"
+    except Exception:
+        pass
+    return "Sathvik307393/RAG_based_log_analysis"
+
+def fetch_github_workflow_status_from_cli():
+    try:
+        import subprocess
+        res = subprocess.run(["gh", "run", "list", "--limit", "1", "--json", "databaseId,number,name,status,conclusion,event,headBranch,headSha,triggeringActor,createdAt,updatedAt,title"], capture_output=True, text=True, check=True)
+        runs = json.loads(res.stdout)
+        if not runs:
+            return None
+        latest = runs[0]
+        run_id = latest["databaseId"]
+        
+        res_jobs = subprocess.run(["gh", "run", "view", str(run_id), "--json", "jobs"], capture_output=True, text=True, check=True)
+        jobs_data = json.loads(res_jobs.stdout)
+        
+        jobs = []
+        for j in jobs_data.get("jobs", []):
+            steps = []
+            for s in j.get("steps", []):
+                steps.append({
+                    "name": s.get("name"),
+                    "status": s.get("status"),
+                    "conclusion": s.get("conclusion")
+                })
+            
+            jobs.append({
+                "id": j.get("id"),
+                "name": j.get("name"),
+                "status": j.get("status"),
+                "conclusion": j.get("conclusion"),
+                "started_at": j.get("startedAt"),
+                "completed_at": j.get("completedAt"),
+                "html_url": f"https://github.com/{get_git_repo_info()}/actions/runs/{run_id}/job/{j.get('id')}",
+                "steps": steps
+            })
+            
+        return {
+            "source": "cli",
+            "repo": get_git_repo_info(),
+            "run_id": run_id,
+            "run_number": latest.get("number"),
+            "name": latest.get("name"),
+            "status": latest.get("status").lower() if latest.get("status") else None,
+            "conclusion": latest.get("conclusion").lower() if latest.get("conclusion") else None,
+            "html_url": f"https://github.com/{get_git_repo_info()}/actions/runs/{run_id}",
+            "event": latest.get("event"),
+            "head_branch": latest.get("headBranch"),
+            "head_commit_message": latest.get("title", "No message"),
+            "head_sha": latest.get("headSha"),
+            "actor": latest.get("triggeringActor", {}).get("login", "unknown"),
+            "created_at": latest.get("createdAt"),
+            "updated_at": latest.get("updatedAt"),
+            "jobs": jobs
+        }
+    except Exception:
+        return None
+
+def generate_mock_workflow_status(anomaly_type):
+    repo_fullname = get_git_repo_info()
+    ts = datetime.utcnow()
+    
+    status = "completed"
+    conclusion = "success"
+    
+    jobs_info = [
+        {"name": "Lint & Unit Testing", "status": "completed", "conclusion": "success", "delay": 20},
+        {"name": "Snyk Dependency & SAST Scan", "status": "completed", "conclusion": "success", "delay": 40},
+        {"name": "SonarQube Analysis", "status": "completed", "conclusion": "success", "delay": 45},
+        {"name": "Container Build & Trivy Vulnerability Scan", "status": "completed", "conclusion": "success", "delay": 60},
+        {"name": "Kubernetes Deploy Dry Run", "status": "completed", "conclusion": "success", "delay": 20},
+        {"name": "Dynamic Application Security Scan (DAST)", "status": "completed", "conclusion": "success", "delay": 90},
+    ]
+    
+    if anomaly_type == "db_locked":
+        conclusion = "failure"
+        jobs_info[3]["conclusion"] = "failure"
+        jobs_info[4]["status"] = "queued"
+        jobs_info[4]["conclusion"] = None
+        jobs_info[5]["status"] = "queued"
+        jobs_info[5]["conclusion"] = None
+        jobs_info.append({"name": "Send Email on Failure", "status": "completed", "conclusion": "success", "delay": 15})
+        
+    elif anomaly_type == "timeout":
+        conclusion = "failure"
+        jobs_info[5]["conclusion"] = "failure"
+        jobs_info.append({"name": "Send Email on Failure", "status": "completed", "conclusion": "success", "delay": 15})
+        
+    elif anomaly_type == "brute_force":
+        status = "in_progress"
+        conclusion = None
+        jobs_info[1]["status"] = "in_progress"
+        jobs_info[1]["conclusion"] = None
+        for i in range(2, 6):
+            jobs_info[i]["status"] = "queued"
+            jobs_info[i]["conclusion"] = None
+            
+    jobs = []
+    for idx, j in enumerate(jobs_info):
+        started_at = (ts - timedelta(seconds=180 - j["delay"])).isoformat() + "Z"
+        completed_at = (ts - timedelta(seconds=180 - j["delay"] - 15)).isoformat() + "Z" if j["status"] == "completed" else None
+        
+        steps = []
+        if j["status"] == "completed":
+            steps = [
+                {"name": "Checkout Code", "status": "completed", "conclusion": "success"},
+                {"name": "Run main script", "status": "completed", "conclusion": j["conclusion"]}
+            ]
+        elif j["status"] == "in_progress":
+            steps = [
+                {"name": "Checkout Code", "status": "completed", "conclusion": "success"},
+                {"name": "Run main script", "status": "in_progress", "conclusion": None}
+            ]
+            
+        jobs.append({
+            "id": 1000 + idx,
+            "name": j["name"],
+            "status": j["status"],
+            "conclusion": j["conclusion"],
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "html_url": f"https://github.com/{repo_fullname}/actions/runs/12345/job/{1000+idx}",
+            "steps": steps
+        })
+        
+    return {
+        "source": "simulated",
+        "repo": repo_fullname,
+        "run_id": 12345,
+        "run_number": 15,
+        "name": "DevSecOps CI/CD Pipeline",
+        "status": status,
+        "conclusion": conclusion,
+        "html_url": f"https://github.com/{repo_fullname}/actions/runs/12345",
+        "event": "push",
+        "head_branch": "main",
+        "head_commit_message": f"Simulated commit for {anomaly_type} event",
+        "head_sha": "d3adb33fd3adb33fd3adb33f",
+        "actor": "sathvik307393",
+        "created_at": (ts - timedelta(minutes=3)).isoformat() + "Z",
+        "updated_at": ts.isoformat() + "Z",
+        "jobs": jobs
+    }
+
+def fetch_github_workflow_status(anomaly_type="healthy"):
+    repo_fullname = get_git_repo_info()
+    github_token = os.getenv("GITHUB_TOKEN") or st.session_state.get("github_token", "")
+    
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+    }
+    if github_token:
+        headers["Authorization"] = f"token {github_token}"
+    
+    runs_url = f"https://api.github.com/repos/{repo_fullname}/actions/runs"
+    
+    try:
+        r = requests.get(runs_url, headers=headers, timeout=5)
+        if r.status_code == 200:
+            data = r.json()
+            runs = data.get("workflow_runs", [])
+            if not runs:
+                return generate_mock_workflow_status(anomaly_type)
+            
+            latest_run = runs[0]
+            run_id = latest_run["id"]
+            
+            jobs_url = f"https://api.github.com/repos/{repo_fullname}/actions/runs/{run_id}/jobs"
+            jr = requests.get(jobs_url, headers=headers, timeout=5)
+            jobs_data = {}
+            if jr.status_code == 200:
+                jobs_data = jr.json()
+            else:
+                return generate_mock_workflow_status(anomaly_type)
+            
+            jobs = []
+            for j in jobs_data.get("jobs", []):
+                jobs.append({
+                    "id": j.get("id"),
+                    "name": j.get("name"),
+                    "status": j.get("status"),
+                    "conclusion": j.get("conclusion"),
+                    "started_at": j.get("started_at"),
+                    "completed_at": j.get("completed_at"),
+                    "html_url": j.get("html_url"),
+                    "steps": [{"name": s.get("name"), "status": s.get("status"), "conclusion": s.get("conclusion")} for s in j.get("steps", [])]
+                })
+                
+            return {
+                "source": "api",
+                "repo": repo_fullname,
+                "run_id": run_id,
+                "run_number": latest_run.get("run_number"),
+                "name": latest_run.get("name"),
+                "status": latest_run.get("status"),
+                "conclusion": latest_run.get("conclusion"),
+                "html_url": latest_run.get("html_url"),
+                "event": latest_run.get("event"),
+                "head_branch": latest_run.get("head_branch"),
+                "head_commit_message": latest_run.get("head_commit", {}).get("message", "No message"),
+                "head_sha": latest_run.get("head_sha"),
+                "actor": latest_run.get("triggering_actor", {}).get("login", latest_run.get("actor", {}).get("login", "unknown")),
+                "created_at": latest_run.get("created_at"),
+                "updated_at": latest_run.get("updated_at"),
+                "jobs": jobs
+            }
+        else:
+            cli_res = fetch_github_workflow_status_from_cli()
+            if cli_res:
+                return cli_res
+            return generate_mock_workflow_status(anomaly_type)
+    except Exception:
+        cli_res = fetch_github_workflow_status_from_cli()
+        if cli_res:
+            return cli_res
+        return generate_mock_workflow_status(anomaly_type)
+
+# ─────────────────────────────────────────────
 #  Local Mock Log Generator for Anomalies
 # ─────────────────────────────────────────────
+
 def generate_mock_logs(anomaly_type):
     ts = datetime.utcnow()
     logs = []
@@ -467,6 +787,9 @@ st.sidebar.markdown("<div style='text-align:center;'><h2 style='border-left:none
 # Azure Configurations
 st.sidebar.subheader("🔌 Azure RAG Status")
 gateway_url = st.sidebar.text_input("API Gateway URL", "http://localhost:5000")
+github_token_input = st.sidebar.text_input("GitHub Token (Optional)", value=os.getenv("GITHUB_TOKEN", ""), type="password", help="Enter a GitHub PAT to avoid API rate limiting")
+if github_token_input:
+    st.session_state["github_token"] = github_token_input
 
 azure_configured = False
 if RAG_AVAILABLE and AZURE_OPENAI_API_KEY and AZURE_SEARCH_ENDPOINT:
@@ -588,6 +911,180 @@ with col4:
         st.markdown('<div class="metric-card"><div class="stat-label">Average API Latency</div><div class="stat-val" style="color:#ef4444;">1240.2 ms</div></div>', unsafe_allow_html=True)
     else:
         st.markdown('<div class="metric-card"><div class="stat-label">Average API Latency</div><div class="stat-val" style="color:#ffb300;">85.1 ms</div></div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+#  CI/CD Pipeline Monitor Widget
+# ─────────────────────────────────────────────
+st.markdown("### 🔄 CI/CD DevSecOps Pipeline Monitor")
+
+with st.spinner("Fetching latest pipeline status from GitHub..."):
+    current_anomaly_state = anomaly_mapping[active_anomaly]
+    pipeline_state = fetch_github_workflow_status(current_anomaly_state)
+
+if "error" in pipeline_state:
+    st.warning(f"Could not load live pipeline status: {pipeline_state['error']}")
+else:
+    conclusion = pipeline_state.get("conclusion")
+    status = pipeline_state.get("status")
+    
+    if conclusion == "success":
+        status_bg = "rgba(16, 185, 129, 0.2)"
+        status_fg = "#10b981"
+        status_label = "SUCCESS"
+    elif conclusion == "failure":
+        status_bg = "rgba(239, 68, 68, 0.2)"
+        status_fg = "#ef4444"
+        status_label = "FAILED"
+    elif status == "in_progress":
+        status_bg = "rgba(255, 179, 0, 0.2)"
+        status_fg = "#ffb300"
+        status_label = "IN PROGRESS"
+    else:
+        status_bg = "rgba(100, 116, 139, 0.2)"
+        status_fg = "#64748b"
+        status_label = "QUEUED / UNKNOWN"
+        
+    meta_cols = st.columns([3, 2, 3, 2])
+    with meta_cols[0]:
+        st.markdown(f"**Run:** [#{pipeline_state['run_number']} - {pipeline_state['name']}]({pipeline_state['html_url']})")
+    with meta_cols[1]:
+        st.markdown(f"**Branch:** `{pipeline_state['head_branch']}`")
+    with meta_cols[2]:
+        st.markdown(f"**Trigger:** `{pipeline_state['event']}` by @{pipeline_state['actor']}")
+    with meta_cols[3]:
+        if st.button("↻ Refresh Pipeline", key="refresh_pipeline_btn"):
+            st.toast("Refreshing pipeline status...")
+            st.rerun()
+            
+    st.markdown(f"**Latest Commit:** *\"{pipeline_state['head_commit_message']}\"* (`{pipeline_state['head_sha'][:7] if pipeline_state['head_sha'] else ''}`)")
+    
+    job_html = ""
+    for job in pipeline_state.get("jobs", []):
+        job_conclusion = job.get("conclusion")
+        job_status = job.get("status")
+        
+        if job_conclusion == "success":
+            dot_class = "dot-green"
+            status_text = "Success"
+            border_color = "rgba(16, 185, 129, 0.3)"
+        elif job_conclusion == "failure":
+            dot_class = "dot-red"
+            status_text = "Failed"
+            border_color = "rgba(239, 68, 68, 0.4)"
+        elif job_status == "in_progress":
+            dot_class = "dot-yellow"
+            status_text = "In Progress"
+            border_color = "rgba(255, 179, 0, 0.4)"
+        else:
+            dot_class = "dot-grey"
+            status_text = "Queued"
+            border_color = "rgba(100, 116, 139, 0.2)"
+            
+        job_card = f"""<div class="pipeline-job-card" style="border: 1px solid {border_color};">
+<div class="pipeline-job-name">{job['name']}</div>
+<div class="pipeline-job-status">
+<span class="{dot_class}"></span>
+<span>{status_text}</span>
+</div>
+</div>"""
+        job_html += job_card
+        
+    def get_job_diagnostic(name, steps=None):
+        name_lower = name.lower()
+        
+        # Check step details first to find the exact failed step
+        failed_step = None
+        if steps:
+            for s in steps:
+                if s.get("conclusion") == "failure":
+                    failed_step = s.get("name")
+                    break
+        
+        # Determine source and remedy based on failed step or job name
+        check_str = ((failed_step.lower() + " ") if failed_step else "") + name_lower
+        
+        if "lint" in check_str or "flake8" in check_str:
+            source = "Python code style check (flake8)"
+            remedy = "Verify that Python syntax is correct and formatting matches PEP 8 guidelines. Run flake8 locally to identify and fix style violations."
+        elif "unit test" in check_str or "pytest" in check_str or "testing" in check_str:
+            source = "Unit Testing Framework (pytest)"
+            remedy = "Check the unit test logs. Fix failing assertions, mock dependencies correctly, or check for unhandled exceptions in the test files."
+        elif "snyk" in check_str or "dependency" in check_str:
+            source = "Snyk Dependency & SAST Scanner"
+            remedy = "Check the dependency vulnerability log. Upgrade vulnerable third-party library versions listed in requirements.txt to clean security gates."
+        elif "sonar" in check_str:
+            source = "SonarQube Quality Gate & Analysis"
+            remedy = "Check that the SonarQube scanner is correctly configured in sonar-project.properties and that the target SonarQube instance is reachable over the private network."
+        elif "docker" in check_str or "build" in check_str or "image" in check_str or "trivy" in check_str:
+            source = "Docker Build / Trivy Vulnerability Scan"
+            remedy = "Inspect the Dockerfile for build command failures, ensure base images are accessible, and check Trivy logs for high/critical security issues."
+        elif "deploy" in check_str or "kube" in check_str or "k8s" in check_str or "manifest" in check_str:
+            source = "Kubernetes Deployment Dry Run (Kubeconform)"
+            remedy = "Validate your k8s/ manifests. Ensure proper YAML syntax (indentation) and correct resource schemas (e.g. apps/v1 for Deployments). (Note: Deprecated kubeval has been replaced by kubeconform to resolve schema certificate issues)."
+        elif "dast" in check_str or "zap" in check_str or "baseline" in check_str:
+            source = "Dynamic Application Security Testing (OWASP ZAP)"
+            remedy = "Verify the target application endpoint is running and responding. Adjust DAST rules in .zap/rules.tsv if there are false positives."
+        elif "mail" in check_str or "email" in check_str or "notify" in check_str:
+            source = "Notification Workflow (action-send-mail)"
+            remedy = "Check SMTP server settings, confirm credentials (MAIL_USERNAME/MAIL_PASSWORD) are set in secrets, and check recipient mailboxes."
+        else:
+            source = "General Actions Workflow Step"
+            remedy = f"Inspect the job step logs directly in the GitHub Actions Console. Check the build logs for '{failed_step or name}'."
+
+        return {
+            "source": source,
+            "failed_step": failed_step,
+            "remedy": remedy
+        }
+
+    # Build the diagnostic panel content
+    diagnostic_html = ""
+    if conclusion == "failure":
+        failed_jobs_details = []
+        for job in pipeline_state.get("jobs", []):
+            if job.get("conclusion") == "failure":
+                diag = get_job_diagnostic(job["name"], job.get("steps", []))
+                step_info = f" (Failed Step: <code>{diag['failed_step']}</code>)" if diag['failed_step'] else ""
+                failed_jobs_details.append(f"""<div style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 8px;">
+<p style="margin: 0 0 4px 0;"><strong>Failed Step:</strong> <a href="{job['html_url']}" target="_blank" style="color: #ef4444; font-weight: bold; text-decoration: none;">{job['name']}{step_info} ↗</a></p>
+<p style="margin: 0 0 4px 0; color: #94a3b8; font-size: 0.8rem;"><strong>Source:</strong> {diag['source']}</p>
+<p style="margin: 0 0 0 0; color: #f1f5f9; font-size: 0.85rem;"><strong>Remedy:</strong> {diag['remedy']}</p>
+</div>""")
+        
+        failed_list_html = "".join(failed_jobs_details)
+        diagnostic_html = f"""<div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
+<h4 style="margin: 0 0 10px 0; color: #ef4444; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🚨 Pipeline Outage Diagnostics</h4>
+<div style="max-height: 250px; overflow-y: auto;">
+{failed_list_html}
+</div>
+</div>"""
+    elif status == "in_progress":
+        diagnostic_html = f"""<div style="background: rgba(255, 179, 0, 0.05); border: 1px solid rgba(255, 179, 0, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
+<h4 style="margin: 0 0 10px 0; color: #ffb300; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🟡 Active Build running</h4>
+<p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">GitHub Actions is actively compiling code and executing security gates. Use the Refresh button above to poll live status.</p>
+</div>"""
+    else:
+        diagnostic_html = f"""<div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
+<h4 style="margin: 0 0 10px 0; color: #10b981; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🟢 Pipeline Healthy</h4>
+<p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">All DevSecOps verification checks and Kubeconform linter tests have passed successfully. System integrity is verified.</p>
+</div>"""
+
+    # We use Streamlit columns to separate jobs grid (left) and diagnostic details (right)
+    col_left, col_right = st.columns([6, 4])
+    
+    with col_left:
+        st.markdown(f"""<div class="pipeline-container" style="border-top: 3px solid {status_fg}; height: 100%;">
+<div class="pipeline-header">
+<span class="pipeline-title">Workflow Execution Jobs</span>
+<span style="background: {status_bg}; color: {status_fg}; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">{status_label}</span>
+</div>
+<div class="pipeline-grid">
+{job_html}
+</div>
+</div>""", unsafe_allow_html=True)
+
+    with col_right:
+        st.markdown(diagnostic_html, unsafe_allow_html=True)
 
 st.markdown("### 🚨 Proactive AIOps Incident Alerts")
 
@@ -714,7 +1211,80 @@ if user_input := st.chat_input("Query incident logs...") or quick_query:
             answer = ""
             citations = []
             
-            if azure_configured:
+            is_pipeline_query = any(kw in query_to_run.lower() for kw in ["pipeline", "job", "workflow", "ci/cd", "ci-cd", "github action", "actions run", "current build", "build status"])
+            
+            if is_pipeline_query:
+                # Fetch pipeline status
+                current_anomaly_state = anomaly_mapping[active_anomaly]
+                pipeline_state = fetch_github_workflow_status(current_anomaly_state)
+                
+                if "error" in pipeline_state:
+                    answer = f"""### 🔄 GitHub Actions Pipeline Status
+                    
+⚠️ **Could not fetch live status:** {pipeline_state['error']}
+                    
+Please verify your GitHub credentials or connectivity. Under healthy simulated operations, the local mock pipeline reports success."""
+                    citations = []
+                else:
+                    status = pipeline_state.get("status", "unknown")
+                    conclusion = pipeline_state.get("conclusion")
+                    run_number = pipeline_state.get("run_number")
+                    repo_name = pipeline_state.get("repo")
+                    html_url = pipeline_state.get("html_url")
+                    branch = pipeline_state.get("head_branch")
+                    commit_msg = pipeline_state.get("head_commit_message")
+                    actor = pipeline_state.get("actor")
+                    source = pipeline_state.get("source")
+                    
+                    status_emoji = "🟢 Success" if conclusion == "success" else ("🔴 Failed" if conclusion == "failure" else "🟡 In Progress" if status == "in_progress" else "⚪ Queued/Unknown")
+                    
+                    jobs_status_list = []
+                    for job in pipeline_state.get("jobs", []):
+                        job_conclusion = job.get("conclusion")
+                        job_status = job.get("status")
+                        job_emoji = "🟢" if job_conclusion == "success" else ("🔴" if job_conclusion == "failure" else "🟡" if job_status == "in_progress" else "⚪")
+                        
+                        job_state = "Completed successfully" if job_conclusion == "success" else ("Failed" if job_conclusion == "failure" else "In Progress" if job_status == "in_progress" else "Queued/Skipped")
+                        jobs_status_list.append(f"- {job_emoji} **{job['name']}**: {job_state}")
+                    
+                    jobs_summary = "\n".join(jobs_status_list)
+                    
+                    answer = f"""### 🔄 GitHub Actions Pipeline Status (Source: {source.upper()})
+
+The latest workflow run **#{run_number}** for repository **[{repo_name}](https://github.com/{repo_name})** on branch `{branch}` is currently **{status_emoji}**.
+
+#### 📋 Run Details
+- **Workflow Name**: {pipeline_state.get('name', 'DevSecOps CI/CD Pipeline')}
+- **Trigger Event**: `{pipeline_state.get('event')}` by **@{actor}**
+- **Latest Commit**: `{commit_msg}` (`{pipeline_state.get('head_sha')[:7] if pipeline_state.get('head_sha') else ''}`)
+- **Workflow Link**: [View on GitHub Actions]({html_url})
+
+#### 🛠️ Job Execution Breakdown
+{jobs_summary}"""
+                    if conclusion == "failure":
+                        failed_jobs = [j['name'] for j in pipeline_state.get('jobs', []) if j.get('conclusion') == 'failure']
+                        answer += f"\n\n#### 🚨 SRE Outage Correlation\n"
+                        answer += f"The pipeline failed during the **{', '.join(failed_jobs)}** stage. "
+                        
+                        recent_incidents = load_local_incidents()
+                        if recent_incidents:
+                            latest_inc = recent_incidents[-1]
+                            answer += f"This failure correlates with the active incident: **{latest_inc['service']} ({latest_inc['severity']})** - *\"{latest_inc['message']}\"*.\n\n"
+                            answer += f"**Recommended Action:**\n{latest_inc['answer']}"
+                        else:
+                            answer += "Check the live logs panel for recent exception traces. If SonarQube fails, ensure that the sonar-project.properties is correctly configured and the AWS SonarQube server is reachable over the VPN. If Trivy or Deploy fails, verify the docker file path and registry pull secrets."
+                    
+                    citations = []
+                    for job in pipeline_state.get("jobs", []):
+                        if job.get("conclusion") == "failure" or job.get("status") == "in_progress":
+                            citations.append({
+                                "timestamp": datetime.utcnow().isoformat() + "Z",
+                                "service": "GitHub Actions",
+                                "level": "ERROR" if job.get("conclusion") == "failure" else "WARNING",
+                                "message": f"Job '{job['name']}' status is '{job['conclusion'] or job['status']}' on branch {branch}"
+                            })
+                            
+            elif azure_configured:
                 # Run actual Azure RAG Engine
                 try:
                     engine = LogRageEngine()
@@ -725,7 +1295,7 @@ if user_input := st.chat_input("Query incident logs...") or quick_query:
                     answer = f"Azure RAG Execution failed: {str(rag_err)}. Falling back to local responder."
                     azure_configured = False
             
-            if not azure_configured:
+            if not is_pipeline_query and not azure_configured:
                 # Local Mock Mode Anomaly responses
                 # We matches query words with the current active anomaly state
                 time.sleep(1.5) # Simulate thinking latency

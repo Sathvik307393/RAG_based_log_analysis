@@ -105,15 +105,15 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Install Kubeval (K8s Manifest Validator)
+    - name: Install Kubeconform (K8s Manifest Validator)
       run: |
-        wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-        tar xf kubeval-linux-amd64.tar.gz
-        sudo cp kubeval /usr/local/bin
+        wget https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+        tar xf kubeconform-linux-amd64.tar.gz
+        sudo cp kubeconform /usr/local/bin
 
     - name: Lint Kubernetes Manifests
       run: |
-        kubeval k8s/*.yaml
+        kubeconform -summary k8s/
 
   dast-scan:
     name: Dynamic Application Security Scan (DAST)

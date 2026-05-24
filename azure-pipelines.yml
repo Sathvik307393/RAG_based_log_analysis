@@ -100,11 +100,11 @@ stages:
     displayName: 'Lint Kubernetes Files'
     steps:
     - script: |
-        wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-        tar xf kubeval-linux-amd64.tar.gz
-        sudo cp kubeval /usr/local/bin
-        kubeval k8s/*.yaml
-      displayName: 'Run Kubeval Linter'
+        wget https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+        tar xf kubeconform-linux-amd64.tar.gz
+        sudo cp kubeconform /usr/local/bin
+        kubeconform -summary k8s/
+      displayName: 'Run Kubeconform Linter'
 
 - stage: DASTScan
   displayName: 'DAST Security Scan'
