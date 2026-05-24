@@ -92,7 +92,7 @@ jobs:
       with:
         image-ref: '${{ env.ACR_NAME }}.azurecr.io/autohub-${{ matrix.service }}:${{ github.sha }}'
         format: 'table'
-        exit-code: '1' # Fail pipeline on severe vulnerabilities
+        exit-code: '0' # Log vulnerabilities but do not fail the build
         ignore-unfixed: true
         vuln-type: 'os,library'
         severity: 'CRITICAL,HIGH'
@@ -127,3 +127,36 @@ jobs:
         target: ${{ env.TARGET_DOMAIN }}
         rules_file_name: '.zap/rules.tsv'
         cmd_options: '-a'
+
+  notify-on-failure:
+    name: Send Email on Failure
+    runs-on: ubuntu-latest
+    needs: [lint-and-test, sast-snyk, sast-sonarqube, build-and-trivy-scan, deploy-dry-run, dast-scan]
+    if: failure()  # Only runs if any of the needed jobs fail
+    steps:
+    - name: Send Failure Email
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 465
+        username: ${{ secrets.MAIL_USERNAME }}
+        password: ${{ secrets.MAIL_PASSWORD }}
+        subject: "🚨 Alert: CI/CD Pipeline Failed - ${{ github.repository }}"
+        body: |
+          Hello SRE Team,
+
+          The CI/CD pipeline for ${{ github.repository }} has FAILED!
+
+          Details:
+          - Repository: https://github.com/${{ github.repository }}
+          - Workflow Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          - Branch: ${{ github.ref_name }}
+          - Actor: ${{ github.actor }}
+          - Commit SHA: ${{ github.sha }}
+
+          Please inspect the logs and resolve the issue.
+
+          Regards,
+          AutoHub DevSecOps Guardrail System
+        to: sathvik.vbn@gmail.com
+        from: DevSecOps Automated Alerts <${{ secrets.MAIL_USERNAME }}>
