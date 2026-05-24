@@ -193,8 +193,6 @@ def get_cgroup_memory_percent():
 
 def update_system_load():
     """Background thread to poll Windows or Linux load metrics dynamically"""
-    global METRICS
-    
     # Try importing psutil inside the thread
     has_psutil = False
     try:

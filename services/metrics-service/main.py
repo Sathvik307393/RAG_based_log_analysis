@@ -102,7 +102,6 @@ def get_linux_memory_percent():
     return 0.0
 
 def update_system_load():
-    global METRICS
     has_psutil = False
     try:
         import psutil

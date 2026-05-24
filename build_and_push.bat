@@ -1,6 +1,6 @@
 @echo off
 if "%~1"=="" (
-    echo Usage: build_and_push.bat ^<your-acr-name^>
+    echo Usage: build_and_push.bat loganalysisregistry
     exit /b 1
 )
 set ACR_NAME=%~1

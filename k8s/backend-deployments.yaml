@@ -17,9 +17,11 @@ spec:
         app: auth-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: auth-service
-        image: autohubacr.azurecr.io/auth-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-auth-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -69,9 +71,11 @@ spec:
         app: inventory-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: inventory-service
-        image: autohubacr.azurecr.io/inventory-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-inventory-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -119,9 +123,11 @@ spec:
         app: maintenance-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: maintenance-service
-        image: autohubacr.azurecr.io/maintenance-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-maintenance-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -171,9 +177,11 @@ spec:
         app: valuation-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: valuation-service
-        image: autohubacr.azurecr.io/valuation-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-valuation-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -223,9 +231,11 @@ spec:
         app: fuel-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: fuel-service
-        image: autohubacr.azurecr.io/fuel-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-fuel-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -275,9 +285,11 @@ spec:
         app: insurance-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: insurance-service
-        image: autohubacr.azurecr.io/insurance-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-insurance-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -327,9 +339,11 @@ spec:
         app: metrics-service
         tier: private
     spec:
+      imagePullSecrets:
+      - name: acr-pull-secret
       containers:
       - name: metrics-service
-        image: autohubacr.azurecr.io/metrics-service:latest
+        image: loganalysisregistry.azurecr.io/autohub-metrics-service:latest
         ports:
         - containerPort: 8000
         env:

@@ -1,0 +1,15 @@
+# Environment variables
+.env
+
+# Local simulation databases
+local_logs.json
+local_incidents.json
+local_warning_queue.json
+
+# Python caching
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Streamlit temporary files
+.streamlit/
