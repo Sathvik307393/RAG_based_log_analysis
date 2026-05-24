@@ -574,6 +574,7 @@ def generate_mock_workflow_status(anomaly_type):
         "jobs": jobs
     }
 
+@st.cache_data(ttl=2)
 def fetch_github_workflow_status(anomaly_type="healthy"):
     repo_fullname = get_git_repo_info()
     github_token = os.getenv("GITHUB_TOKEN") or st.session_state.get("github_token", "")
@@ -588,7 +589,7 @@ def fetch_github_workflow_status(anomaly_type="healthy"):
     runs_url = f"https://api.github.com/repos/{repo_fullname}/actions/runs"
     
     try:
-        r = requests.get(runs_url, headers=headers, timeout=5)
+        r = requests.get(runs_url, headers=headers, timeout=2)
         if r.status_code == 200:
             data = r.json()
             runs = data.get("workflow_runs", [])
@@ -599,7 +600,7 @@ def fetch_github_workflow_status(anomaly_type="healthy"):
             run_id = latest_run["id"]
             
             jobs_url = f"https://api.github.com/repos/{repo_fullname}/actions/runs/{run_id}/jobs"
-            jr = requests.get(jobs_url, headers=headers, timeout=5)
+            jr = requests.get(jobs_url, headers=headers, timeout=2)
             jobs_data = {}
             if jr.status_code == 200:
                 jobs_data = jr.json()
