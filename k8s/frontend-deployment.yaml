@@ -35,7 +35,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: autohub-frontend-service
+  name: frontend
   namespace: autohub
   labels:
     app: autohub-frontend
