@@ -1,0 +1,124 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ACR_NAME: 'autohubacr'
+  AKS_CLUSTER: 'autohub-aks'
+  RESOURCE_GROUP: 'autohub-rg'
+  TARGET_DOMAIN: 'https://your-domain.com'
+
+stages:
+- stage: BuildTest
+  displayName: 'Build and Unit Test'
+  jobs:
+  - job: PythonTest
+    displayName: 'Linting & Pytest'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.10'
+    - script: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      displayName: 'Install Dependencies'
+    - script: |
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      displayName: 'Lint with flake8'
+
+- stage: SecurityScan
+  displayName: 'SAST Security Scanning'
+  dependsOn: BuildTest
+  jobs:
+  - job: SnykScan
+    displayName: 'Snyk Dependency Check'
+    steps:
+    - task: SnykSecurityScan@1
+      inputs:
+        serviceConnectionEndpoint: 'SnykConnection'
+        testType: 'app'
+        monitorOnBuild: true
+        failOnIssues: true
+      env:
+        SNYK_TOKEN: $(SNYK_TOKEN)
+
+  - job: SonarScan
+    displayName: 'SonarQube Analysis'
+    steps:
+    - task: SonarQubePrepare@5
+      inputs:
+        SonarQube: 'SonarQubeServer'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'autohub-log-analysis'
+        cliProjectName: 'autohub-log-analysis'
+        cliSources: '.'
+    - task: SonarQubeAnalyze@5
+    - task: SonarQubePublish@5
+      inputs:
+        pollingTimeoutSec: '300'
+
+- stage: ImageBuildAndScan
+  displayName: 'Docker Build & Trivy Image Scan'
+  dependsOn: SecurityScan
+  jobs:
+  - job: ContainerBuild
+    displayName: 'Build & Scan Containers'
+    strategy:
+      matrix:
+        gateway:
+          svc: 'gateway'
+        frontend:
+          svc: 'frontend'
+        auth:
+          svc: 'auth-service'
+        inventory:
+          svc: 'inventory-service'
+        metrics:
+          svc: 'metrics-service'
+    steps:
+    - script: |
+        docker build -t $(ACR_NAME).azurecr.io/autohub-$(svc):$(Build.BuildId) -f services/$(svc)/Dockerfile services/$(svc)/
+      displayName: 'Build Service Container'
+    
+    - script: |
+        # Install Trivy
+        wget https://github.com/aquasecurity/trivy/releases/download/v0.49.1/trivy_0.49.1_Linux-64bit.deb
+        sudo dpkg -i trivy_0.49.1_Linux-64bit.deb
+        # Run Scanner
+        trivy image --exit-code 1 --ignore-unfixed --severity CRITICAL,HIGH $(ACR_NAME).azurecr.io/autohub-$(svc):$(Build.BuildId)
+      displayName: 'Trivy Image Scan'
+
+- stage: DeploymentDryRun
+  displayName: 'Kubernetes Validation'
+  dependsOn: ImageBuildAndScan
+  jobs:
+  - job: ManifestLint
+    displayName: 'Lint Kubernetes Files'
+    steps:
+    - script: |
+        wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
+        tar xf kubeval-linux-amd64.tar.gz
+        sudo cp kubeval /usr/local/bin
+        kubeval k8s/*.yaml
+      displayName: 'Run Kubeval Linter'
+
+- stage: DASTScan
+  displayName: 'DAST Security Scan'
+  dependsOn: DeploymentDryRun
+  jobs:
+  - job: ZAPScan
+    displayName: 'OWASP ZAP Baseline Scan'
+    steps:
+    - script: |
+        docker run --rm -v $(System.DefaultWorkingDirectory):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t $(TARGET_DOMAIN) -J zap_report.json || true
+      displayName: 'Run OWASP ZAP baseline scan container'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(System.DefaultWorkingDirectory)/zap_report.json'
+        ArtifactName: 'ZAP_Security_Report'
+        publishLocation: 'Container'
+      displayName: 'Publish Scan Report'

@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  gateway:
+    build: ./services/gateway
+    container_name: autohub-gateway
+    ports:
+      - "5000:5000"
+    depends_on:
+      - frontend
+      - auth-service
+      - inventory-service
+      - maintenance-service
+      - valuation-service
+      - fuel-service
+      - insurance-service
+      - metrics-service
+    networks:
+      - autohub-net
+
+  frontend:
+    build: ./services/frontend
+    container_name: autohub-frontend
+    networks:
+      - autohub-net
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    environment:
+      - PORT=8000
+    networks:
+      - autohub-net
+
+  inventory-service:
+    build: ./services/inventory-service
+    container_name: inventory-service
+    environment:
+      - PORT=8000
+    networks:
+      - autohub-net
+
+  maintenance-service:
+    build: ./services/maintenance-service
+    container_name: maintenance-service
+    environment:
+      - PORT=8000
+      - INVENTORY_SERVICE_URL=http://inventory-service:8000
+    depends_on:
+      - inventory-service
+    networks:
+      - autohub-net
+
+  valuation-service:
+    build: ./services/valuation-service
+    container_name: valuation-service
+    environment:
+      - PORT=8000
+      - INVENTORY_SERVICE_URL=http://inventory-service:8000
+    depends_on:
+      - inventory-service
+    networks:
+      - autohub-net
+
+  fuel-service:
+    build: ./services/fuel-service
+    container_name: fuel-service
+    environment:
+      - PORT=8000
+      - INVENTORY_SERVICE_URL=http://inventory-service:8000
+    depends_on:
+      - inventory-service
+    networks:
+      - autohub-net
+
+  insurance-service:
+    build: ./services/insurance-service
+    container_name: insurance-service
+    environment:
+      - PORT=8000
+      - INVENTORY_SERVICE_URL=http://inventory-service:8000
+    depends_on:
+      - inventory-service
+    networks:
+      - autohub-net
+
+  metrics-service:
+    build: ./services/metrics-service
+    container_name: metrics-service
+    environment:
+      - PORT=8000
+      - INVENTORY_SERVICE_URL=http://inventory-service:8000
+      - MAINTENANCE_SERVICE_URL=http://maintenance-service:8000
+      - FUEL_SERVICE_URL=http://fuel-service:8000
+      - INSURANCE_SERVICE_URL=http://insurance-service:8000
+    depends_on:
+      - inventory-service
+      - maintenance-service
+      - fuel-service
+      - insurance-service
+    networks:
+      - autohub-net
+
+networks:
+  autohub-net:
+    driver: bridge

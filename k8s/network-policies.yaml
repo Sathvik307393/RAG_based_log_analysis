@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-private-ingress
+  namespace: autohub
+spec:
+  podSelector:
+    matchLabels:
+      tier: private
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-gateway-to-backend
+  namespace: autohub
+spec:
+  podSelector:
+    matchLabels:
+      tier: private
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: autohub-gateway
+    ports:
+    - protocol: TCP
+      port: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-internal-backend-mesh
+  namespace: autohub
+spec:
+  podSelector:
+    matchLabels:
+      tier: private
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          tier: private
+    ports:
+    - protocol: TCP
+      port: 8000

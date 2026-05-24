@@ -1,0 +1,52 @@
+[
+  {
+    "id": "75116ad9-f455-43bb-8d54-fe788aa41295",
+    "timestamp": "2026-05-24T11:13:58.911232Z",
+    "service": "gateway",
+    "level": "INFO",
+    "message": "GET /api/inventory -> PROXY TO inventory-service | ReqID: d156fc63",
+    "latency_ms": 5005.2,
+    "status_code": 503,
+    "request_id": "d156fc63"
+  },
+  {
+    "id": "534e7179-58a1-4c93-a1c0-d39e47ddab1b",
+    "timestamp": "2026-05-24T11:13:59.911232Z",
+    "service": "inventory-service",
+    "level": "ERROR",
+    "message": "DB Query failed: Database Connection Timeout on pool. Connection count exceeded maximum limit of 50 connections.",
+    "latency_ms": 5000.0,
+    "status_code": 503,
+    "request_id": "d156fc63"
+  },
+  {
+    "id": "b46590e2-15f6-4bd9-ae3d-2e05f801e999",
+    "timestamp": "2026-05-24T11:14:08.911232Z",
+    "service": "metrics-service",
+    "level": "WARNING",
+    "message": "Health check probe failed for inventory-service on http://inventory-service:8000/health: Status 503 Service Unavailable",
+    "latency_ms": 12.1,
+    "status_code": 503,
+    "request_id": ""
+  },
+  {
+    "id": "06c35fc2-0427-4a67-b9e7-5dc4015fa20a",
+    "timestamp": "2026-05-24T11:27:45.098410Z",
+    "service": "gateway",
+    "level": "INFO",
+    "message": "GET /api/valuation -> PROXY TO valuation-service | ReqID: b540d9a8",
+    "latency_ms": 2012.4,
+    "status_code": 502,
+    "request_id": "b540d9a8"
+  },
+  {
+    "id": "c6bb3154-3a81-42ef-b121-0bc429169071",
+    "timestamp": "2026-05-24T11:27:46.098410Z",
+    "service": "valuation-service",
+    "level": "ERROR",
+    "message": "Valuation failed for all fleet: inventory-service connection exception: HTTPConnectionPool(host='inventory-service', port=8000): Read timed out. (read timeout=2.0)",
+    "latency_ms": 2004.1,
+    "status_code": 502,
+    "request_id": "b540d9a8"
+  }
+]

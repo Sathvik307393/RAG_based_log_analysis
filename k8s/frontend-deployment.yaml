@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autohub-frontend
+  namespace: autohub
+  labels:
+    app: autohub-frontend
+    tier: public
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autohub-frontend
+  template:
+    metadata:
+      labels:
+        app: autohub-frontend
+        tier: public
+    spec:
+      containers:
+      - name: frontend
+        image: autohubacr.azurecr.io/autohub-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autohub-frontend-service
+  namespace: autohub
+  labels:
+    app: autohub-frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: autohub-frontend

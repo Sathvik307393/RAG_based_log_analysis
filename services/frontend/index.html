@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoHub — Indian Fleet Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Barlow+Condensed:wght@500;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  :root {
+    --bg: #070a13; 
+    --surface: rgba(18, 22, 35, 0.75); 
+    --surface-solid: #111522;
+    --surface2: rgba(30, 39, 61, 0.7); 
+    --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 87, 34, 0.4);
+    --accent: #ff5722; 
+    --accent-glow: rgba(255, 87, 34, 0.35);
+    --accent2: #ffb300; 
+    --text: #f1f5f9; 
+    --muted: #94a3b8;
+    --green: #10b981; 
+    --red: #ef4444; 
+    --blue: #3b82f6;
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body { 
+    background: radial-gradient(circle at 50% 50%, #0d1527 0%, #04070f 100%); 
+    color: var(--text); 
+    font-family: 'Outfit', sans-serif; 
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  
+  /* Auth Screen Glassmorphism style */
+  #auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+  
+  .auth-card {
+    background: rgba(18, 22, 35, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.7), 0 0 20px rgba(255, 87, 34, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .auth-card h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    border-left: none;
+    padding-left: 0;
+  }
+  
+  .auth-subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* Dashboard Main styles */
+  #app-container {
+    display: none;
+  }
+
+  header { 
+    background: rgba(11, 15, 26, 0.85); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); 
+    padding: 0 2.5rem; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    height: 75px; 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  }
+  
+  .logo { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 2.1rem; 
+    font-weight: 900; 
+    letter-spacing: .08em; 
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .logo span { color: var(--accent); }
+  
+  nav { display: flex; gap: .5rem; align-items: center; }
+  
+  nav button { 
+    background: none; 
+    border: none; 
+    color: var(--muted); 
+    font-family: 'Outfit', sans-serif; 
+    font-size: 0.95rem; 
+    font-weight: 600; 
+    padding: .6rem 1.2rem; 
+    cursor: pointer; 
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  nav button:hover { 
+    color: var(--text); 
+    background: rgba(255, 255, 255, 0.04);
+  }
+  nav button.active { 
+    color: #fff; 
+    background: linear-gradient(135deg, var(--accent) 0%, #e64a19 100%); 
+    box-shadow: 0 4px 12px var(--accent-glow);
+  }
+  
+  .logout-btn {
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: var(--red);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #fff;
+  }
+
+  .status-bar { 
+    background: linear-gradient(90deg, #05070c, var(--surface-solid)); 
+    border-bottom: 1px solid var(--border); 
+    padding: .5rem 2.5rem; 
+    font-size: .8rem; 
+    color: var(--muted); 
+    letter-spacing: .05em; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .status-bar span { color: var(--accent2); font-weight: 600; }
+  
+  main { max-width: 1300px; margin: 0 auto; padding: 2.5rem 2rem; }
+  
+  .page { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; } 
+  .page.active { display: block; opacity: 1; }
+  
+  h2 { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 2.4rem; 
+    font-weight: 900; 
+    letter-spacing: .04em; 
+    margin-bottom: 2rem; 
+    text-transform: uppercase; 
+    border-left: 4px solid var(--accent);
+    padding-left: 0.75rem;
+  }
+  h2 span { color: var(--accent); }
+  
+  /* Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.75rem; margin-bottom: 2rem; }
+  .card { 
+    background: var(--surface); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover { 
+    border-color: var(--border-hover); 
+    transform: translateY(-5px); 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 15px rgba(255, 87, 34, 0.12);
+  }
+  
+  .card-img-container {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: #090e18;
+  }
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .card:hover .card-img {
+    transform: scale(1.06);
+  }
+  .card-img-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(17, 21, 34, 1) 0%, rgba(17, 21, 34, 0) 100%);
+  }
+  
+  .card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .card-title { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 1.35rem; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    letter-spacing: .04em; 
+    margin-bottom: .85rem; 
+    color: #fff;
+  }
+  
+  .card-meta { 
+    font-size: .88rem; 
+    color: var(--muted); 
+    margin-bottom: .4rem; 
+    display: flex;
+    justify-content: space-between;
+  }
+  .card-meta span { color: var(--text); font-weight: 500; }
+  
+  .card-value { 
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.8rem; 
+    font-weight: 800; 
+    color: var(--accent2); 
+    text-shadow: 0 0 10px rgba(255, 179, 0, 0.25);
+  }
+  
+  /* Badges */
+  .badge { 
+    display: inline-block; 
+    padding: .3rem .75rem; 
+    border-radius: 6px; 
+    font-size: .74rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: .08em; 
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .badge-green { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: var(--green); text-shadow: 0 0 4px rgba(16,185,129,0.3); }
+  .badge-red { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: var(--red); text-shadow: 0 0 4px rgba(239,68,68,0.3); }
+  .badge-yellow { background: rgba(255, 179, 0, 0.15); border: 1px solid rgba(255, 179, 0, 0.4); color: var(--accent2); text-shadow: 0 0 4px rgba(255,179,0,0.3); }
+  .badge-blue { background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); color: var(--blue); text-shadow: 0 0 4px rgba(59,130,246,0.3); }
+  
+  /* Stats Cards */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+  .stat { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.5rem 1.25rem; 
+    text-align: center; 
+    box-shadow: var(--card-shadow);
+    transition: all 0.2s ease;
+  }
+  .stat:hover {
+    border-color: rgba(255, 179, 0, 0.35);
+    transform: translateY(-2px);
+  }
+  .stat-label { font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: .6rem; font-weight: 600; }
+  .stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 2.2rem; font-weight: 900; color: var(--accent2); text-shadow: 0 0 10px rgba(255, 179, 0, 0.2); }
+  
+  /* Forms */
+  .form-section { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.75rem; 
+    margin-top: 2rem; 
+    box-shadow: var(--card-shadow);
+  }
+  .form-section h3 { 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: 1.35rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: .06em; 
+    margin-bottom: 1.5rem; 
+    color: var(--accent2); 
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; margin-bottom: 1.25rem; }
+  
+  input, select { 
+    background: rgba(10, 14, 24, 0.85); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: .75rem 1rem; 
+    border-radius: 8px; 
+    font-size: .92rem; 
+    font-family: 'Outfit', sans-serif; 
+    width: 100%; 
+    transition: all .25s ease; 
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); background: rgba(16, 21, 35, 0.95); }
+  input::placeholder { color: #475569; }
+  label { font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .45rem; display: block; font-weight: 600; }
+  
+  /* Buttons */
+  .btn { 
+    background: linear-gradient(135deg, var(--accent) 0%, #d84315 100%); 
+    color: #fff; 
+    border: none; 
+    padding: .75rem 2rem; 
+    border-radius: 8px; 
+    font-family: 'Outfit', sans-serif; 
+    font-size: 0.95rem; 
+    font-weight: 700; 
+    letter-spacing: .05em; 
+    text-transform: uppercase; 
+    cursor: pointer; 
+    transition: all 0.25s ease; 
+    box-shadow: 0 4px 14px var(--accent-glow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .btn:hover { 
+    background: linear-gradient(135deg, #ff6e40 0%, #e64a19 100%); 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 18px rgba(255, 87, 34, 0.5); 
+  }
+  .btn:active { transform: translateY(0); }
+  .btn-sm { padding: .45rem 1rem; font-size: .8rem; border-radius: 6px; width: auto; }
+  .btn-outline { background: none; color: var(--accent); border: 1px solid var(--accent); box-shadow: none; }
+  .btn-outline:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+  
+  .auth-toggle {
+    margin-top: 1.5rem;
+    font-size: 0.88rem;
+    text-align: center;
+    color: var(--muted);
+  }
+  .auth-toggle a {
+    color: var(--accent2);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .auth-toggle a:hover {
+    text-decoration: underline;
+  }
+
+  /* Tables */
+  .table-wrap { 
+    background: var(--surface); 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border); 
+    border-radius: 12px; 
+    padding: 1.75rem; 
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem; 
+    overflow-x: auto; 
+  }
+  
+  .table-wrap h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 1.25rem;
+    color: var(--accent2);
+  }
+  
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .9rem; }
+  th { 
+    background: rgba(30, 39, 61, 0.6); 
+    padding: 1rem 1.25rem; 
+    text-align: left; 
+    font-family: 'Barlow Condensed', sans-serif; 
+    font-size: .9rem; 
+    font-weight: 700; 
+    letter-spacing: .1em; 
+    text-transform: uppercase; 
+    color: var(--muted); 
+    border-bottom: 1px solid var(--border); 
+  }
+  th:first-child { border-top-left-radius: 8px; }
+  th:last-child { border-top-right-radius: 8px; }
+  
+  td { padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.03); }
+  
+  .loading { color: var(--muted); font-style: italic; padding: 2.5rem; text-align: center; font-size: 1rem; }
+  .err { color: var(--red); padding: .75rem; background: rgba(239,68,68,.12); border-radius: 6px; margin-top: .75rem; font-size: .88rem; border: 1px solid rgba(239,68,68,0.25); }
+</style>
+</head>
+<body>
+
+<!-- Login/Registration Container -->
+<div id="auth-container">
+  <!-- Login Form -->
+  <div class="auth-card" id="login-card">
+    <div class="logo" style="text-align: center; margin-bottom: 1rem;">Auto<span>Hub</span></div>
+    <h2>Fleet Login</h2>
+    <div class="auth-subtitle">Secure Access to Indian Fleet Management Console</div>
+    
+    <div class="form-group">
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" placeholder="e.g. admin">
+    </div>
+    <div class="form-group">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+    </div>
+    
+    <button class="btn" onclick="handleLogin()">Login to Dashboard</button>
+    <div id="login-err" class="err" style="display:none"></div>
+    
+    <div class="auth-toggle">
+      Don't have an account? <a href="#" onclick="toggleAuth(false)">Register here</a>
+    </div>
+  </div>
+
+  <!-- Registration Form -->
+  <div class="auth-card" id="register-card" style="display: none;">
+    <div class="logo" style="text-align: center; margin-bottom: 1rem;">Auto<span>Hub</span></div>
+    <h2>Register Account</h2>
+    <div class="auth-subtitle">Join the AutoHub Indian Operations Fleet</div>
+    
+    <div class="form-group">
+      <label for="reg-name">Full Name</label>
+      <input type="text" id="reg-name" placeholder="e.g. Sathvik Kumar">
+    </div>
+    <div class="form-group">
+      <label for="reg-username">Username</label>
+      <input type="text" id="reg-username" placeholder="e.g. sathvik">
+    </div>
+    <div class="form-group">
+      <label for="reg-email">Email Address</label>
+      <input type="email" id="reg-email" placeholder="e.g. sathvik@autohub.in">
+    </div>
+    <div class="form-group">
+      <label for="reg-password">Password</label>
+      <input type="password" id="reg-password" placeholder="••••••••">
+    </div>
+    
+    <button class="btn" onclick="handleRegister()">Register Account</button>
+    <div id="reg-err" class="err" style="display:none"></div>
+    
+    <div class="auth-toggle">
+      Already have an account? <a href="#" onclick="toggleAuth(true)">Login here</a>
+    </div>
+  </div>
+</div>
+
+<!-- Main App Dashboard -->
+<div id="app-container">
+  <header>
+    <div class="logo">Auto<span>Hub</span></div>
+    <nav>
+      <button class="active" onclick="navigate('inventory')">Inventory</button>
+      <button onclick="navigate('service')">Service</button>
+      <button onclick="navigate('valuation')">Valuation</button>
+      <button onclick="navigate('fuel')">Fuel</button>
+      <button onclick="navigate('insurance')">Insurance</button>
+      <button onclick="navigate('metrics')">Metrics</button>
+      <button class="logout-btn" onclick="handleLogout()">Logout</button>
+    </nav>
+  </header>
+
+  <div class="status-bar">
+    <div>AutoHub Indian Fleet Operations &nbsp;|&nbsp; <span>₹ INR Active</span> &nbsp;|&nbsp; Distributed Microservices</div>
+    <div id="quick-perf-indicator">Server Health: <span style="color:var(--green)">Online</span></div>
+  </div>
+
+  <main>
+    <!-- Inventory Page -->
+    <div class="page active" id="page-inventory">
+      <h2>Fleet <span>Inventory</span></h2>
+      <div class="stats-row" id="inv-stats"></div>
+      <div class="grid" id="inv-cards"><div class="loading">Loading fleet inventory…</div></div>
+      
+      <div class="form-section">
+        <h3>+ Add New Indian Fleet Vehicle</h3>
+        <div class="form-row">
+          <div><label>Make</label><input id="i-make" placeholder="e.g. Mahindra"></div>
+          <div><label>Model</label><input id="i-model" placeholder="e.g. Thar 4x4"></div>
+          <div><label>Year</label><input id="i-year" type="number" placeholder="e.g. 2023"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Color</label><input id="i-color" placeholder="e.g. Napoli Black"></div>
+          <div><label>Mileage (km)</label><input id="i-mileage" type="number" placeholder="e.g. 12000"></div>
+          <div><label>Original Price (₹)</label><input id="i-price" type="number" placeholder="e.g. 1600000"></div>
+        </div>
+        <div class="form-row">
+          <div style="grid-column: span 3;"><label>Image URL (Optional)</label><input id="i-image_url" placeholder="https://images.unsplash.com/photo-..."></div>
+        </div>
+        <button class="btn btn-sm" onclick="addCar()">Add to Fleet</button>
+        <div id="inv-err" class="err" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Service Page -->
+    <div class="page" id="page-service">
+      <h2>Service &amp; <span>Maintenance Logs</span></h2>
+      <div class="stats-row" id="svc-stats"></div>
+      <div class="table-wrap">
+        <h3>Logged Operations</h3>
+        <table id="svc-table"><tr><td class="loading">Loading service records…</td></tr></table>
+      </div>
+      
+      <div class="form-section">
+        <h3>+ Log Maintenance Operation</h3>
+        <div class="form-row">
+          <div><label>Car ID</label><input id="s-car_id" placeholder="e.g. c1"></div>
+          <div><label>Service Type</label><input id="s-type" placeholder="e.g. Engine Oil Service"></div>
+          <div><label>Operation Cost (₹)</label><input id="s-cost" type="number" placeholder="e.g. 6500"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Odometer Mileage (km)</label><input id="s-mileage" type="number" placeholder="e.g. 15000"></div>
+          <div><label>Next Due Odometer (km)</label><input id="s-next_due_miles" type="number" placeholder="e.g. 25000"></div>
+          <div><label>Service Notes</label><input id="s-notes" placeholder="Shell Helix Synthetic Oil replacement..."></div>
+        </div>
+        <button class="btn btn-sm" onclick="addService()">Log Service Record</button>
+      </div>
+    </div>
+
+    <!-- Valuation Page -->
+    <div class="page" id="page-valuation">
+      <h2>Fleet <span>Valuations (INR)</span></h2>
+      <div class="stats-row" id="val-stats"></div>
+      <div class="grid" id="val-cards"><div class="loading">Computing valuations…</div></div>
+    </div>
+
+    <!-- Fuel Page -->
+    <div class="page" id="page-fuel">
+      <h2>Fuel <span>Tracker &amp; Analytics (₹)</span></h2>
+      <div class="stats-row" id="fuel-stats"></div>
+      <div class="table-wrap">
+        <h3>Fill-up Logs</h3>
+        <table id="fuel-table"><tr><td class="loading">Loading fuel logs…</td></tr></table>
+      </div>
+      
+      <div class="form-section">
+        <h3>+ Log Fuel Fill-up</h3>
+        <div class="form-row">
+          <div><label>Car ID</label><input id="f-car_id" placeholder="e.g. c1"></div>
+          <div><label>Litres Pumped</label><input id="f-litres" type="number" step="0.1" placeholder="e.g. 45.0"></div>
+          <div><label>Cost/Litre (₹)</label><input id="f-cost_per_litre" type="number" step="0.01" placeholder="e.g. 101.50"></div>
+          <div><label>Current Odometer (km)</label><input id="f-odometer" type="number" placeholder="e.g. 15200"></div>
+        </div>
+        <button class="btn btn-sm" onclick="addFuel()">Log Fuel Entry</button>
+      </div>
+    </div>
+
+    <!-- Insurance Page -->
+    <div class="page" id="page-insurance">
+      <h2>Insurance <span>Manager</span></h2>
+      <div class="stats-row" id="ins-stats"></div>
+      <div class="grid" id="ins-cards"><div class="loading">Loading policies…</div></div>
+      
+      <div class="form-section">
+        <h3>+ Attach New Policy</h3>
+        <div class="form-row">
+          <div><label>Car ID</label><input id="p-car_id" placeholder="e.g. c1"></div>
+          <div><label>Provider</label><input id="p-provider" placeholder="e.g. Tata AIG General Insurance"></div>
+          <div><label>Policy Number</label><input id="p-policy_no" placeholder="e.g. TA-2024-5412"></div>
+        </div>
+        <div class="form-row">
+          <div><label>Coverage Type</label>
+            <select id="p-type"><option>Comprehensive</option><option>Third Party</option><option>Third Party Fire &amp; Theft</option></select>
+          </div>
+          <div><label>Annual Premium (₹)</label><input id="p-premium" type="number" placeholder="e.g. 45000"></div>
+          <div><label>Start Date</label><input id="p-start" type="date"></div>
+          <div><label>End Date</label><input id="p-end" type="date"></div>
+        </div>
+        <button class="btn btn-sm" onclick="addPolicy()">Attach Policy</button>
+      </div>
+    </div>
+
+    <!-- Metrics Page -->
+    <div class="page" id="page-metrics">
+      <h2>Server <span>Performance Metrics</span></h2>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-label">Server Uptime</div><div class="stat-val" id="met-uptime">0s</div></div>
+        <div class="stat"><div class="stat-label">Total API Requests</div><div class="stat-val" id="met-requests">0</div></div>
+        <div class="stat"><div class="stat-label">Active CPU Load</div><div class="stat-val" style="color:var(--accent)" id="met-cpu">0.0%</div></div>
+        <div class="stat"><div class="stat-label">RAM Load</div><div class="stat-val" style="color:var(--blue)" id="met-mem">0.0%</div></div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem; margin-bottom: 2.5rem;">
+        <div class="form-section" style="margin-top:0;">
+          <h3>System Load Trends (Real-time)</h3>
+          <div style="position: relative; height: 320px; width: 100%;">
+            <canvas id="chart-system"></canvas>
+          </div>
+        </div>
+        <div class="form-section" style="margin-top:0;">
+          <h3>API Service Volume &amp; Response Latency</h3>
+          <div style="position: relative; height: 320px; width: 100%;">
+            <canvas id="chart-endpoints"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="table-wrap">
+        <h3>Active System Resources &amp; Response Profiles</h3>
+        <table id="met-table">
+          <thead>
+            <tr>
+              <th>Service / Endpoint</th>
+              <th>Type</th>
+              <th>Total Hits</th>
+              <th>Average Response Latency</th>
+              <th>Service Status</th>
+            </tr>
+          </thead>
+          <tbody id="met-table-body">
+            <tr><td colspan="5" class="loading">Loading performance metrics…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const statusBadge = s => { 
+  const map = {available:'badge-green', sold:'badge-red', reserved:'badge-yellow'}; 
+  return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`; 
+};
+
+const $ = id => document.getElementById(id);
+const val = id => $(id)?.value || '';
+
+// Indian currency formatting helper (Lakhs / Crores)
+function formatINR(number) {
+  return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(number);
+}
+
+// Global Auth & API state
+let token = localStorage.getItem('access_token');
+let currentTab = 'inventory';
+let systemCpuHistory = [];
+let systemMemHistory = [];
+let timeLabels = [];
+const MAX_HISTORY = 12;
+
+let systemChart = null;
+let endpointChart = null;
+
+// Initialize layout based on token availability
+if (token) {
+  $('auth-container').style.display = 'none';
+  $('app-container').style.display = 'block';
+} else {
+  $('auth-container').style.display = 'flex';
+  $('app-container').style.display = 'none';
+}
+
+function toggleAuth(showLogin) {
+  if (showLogin) {
+    $('login-card').style.display = 'block';
+    $('register-card').style.display = 'none';
+  } else {
+    $('login-card').style.display = 'none';
+    $('register-card').style.display = 'block';
+  }
+}
+
+// HTTP Headers builder
+function getHeaders() {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+// Request logging callback to Metrics microservice
+async function reportMetricToService(svc, status, latency) {
+  try {
+    await fetch('/api/metrics/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service: svc, status_code: status, latency_ms: latency })
+    });
+  } catch (e) {
+    console.error("Failed to report telemetry metric", e);
+  }
+}
+
+async function api(path, method='GET', body=null, svc_name=null) {
+  const start = performance.now();
+  const opts = { method, headers: getHeaders() };
+  if (body) opts.body = JSON.stringify(body);
+  
+  try {
+    const r = await fetch(path, opts);
+    const latency = performance.now() - start;
+    
+    // Automatically report metrics if we have a service name
+    if (svc_name) {
+      reportMetricToService(svc_name, r.status, latency);
+    }
+    
+    if (r.status === 401) {
+      handleLogout();
+      throw new Error("Session expired. Please log in again.");
+    }
+    
+    if (!r.ok) {
+      const errData = await r.json().catch(() => ({detail: "Server Error"}));
+      throw new Error(errData.detail || `Request failed with code ${r.status}`);
+    }
+    
+    return r.json();
+  } catch (err) {
+    console.error(`API Error on ${path}:`, err);
+    throw err;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Authentication Handlers
+// ─────────────────────────────────────────────
+async function handleLogin() {
+  const u = val('login-username');
+  const p = val('login-password');
+  $('login-err').style.display = 'none';
+  
+  if (!u || !p) {
+    $('login-err').textContent = "Username and password required.";
+    $('login-err').style.display = 'block';
+    return;
+  }
+  
+  try {
+    const data = await api('/api/auth/login', 'POST', { username: u, password: p }, 'auth');
+    token = data.access_token;
+    localStorage.setItem('access_token', token);
+    
+    $('auth-container').style.display = 'none';
+    $('app-container').style.display = 'block';
+    loadInventory();
+    
+    // Reset login form
+    $('login-username').value = '';
+    $('login-password').value = '';
+  } catch (err) {
+    $('login-err').textContent = err.message || "Login failed. Check server status.";
+    $('login-err').style.display = 'block';
+  }
+}
+
+async function handleRegister() {
+  const name = val('reg-name');
+  const u = val('reg-username');
+  const email = val('reg-email');
+  const p = val('reg-password');
+  $('reg-err').style.display = 'none';
+  
+  if (!name || !u || !email || !p) {
+    $('reg-err').textContent = "All fields are required.";
+    $('reg-err').style.display = 'block';
+    return;
+  }
+  
+  try {
+    await api('/api/auth/register', 'POST', { name, username: u, email, password: p }, 'auth');
+    $('reg-err').textContent = "Successfully registered! Logging you in...";
+    $('reg-err').style.color = 'var(--green)';
+    $('reg-err').style.display = 'block';
+    
+    setTimeout(() => {
+      toggleAuth(true);
+      $('login-username').value = u;
+      $('reg-err').style.color = 'var(--red)';
+      $('reg-err').style.display = 'none';
+      
+      // Clear inputs
+      $('reg-name').value = '';
+      $('reg-username').value = '';
+      $('reg-email').value = '';
+      $('reg-password').value = '';
+    }, 1500);
+  } catch (err) {
+    $('reg-err').textContent = err.message || "Registration failed.";
+    $('reg-err').style.display = 'block';
+  }
+}
+
+function handleLogout() {
+  token = null;
+  localStorage.removeItem('access_token');
+  $('app-container').style.display = 'none';
+  $('auth-container').style.display = 'flex';
+  toggleAuth(true);
+}
+
+// ─────────────────────────────────────────────
+//  Navigation & Loading
+// ─────────────────────────────────────────────
+function navigate(page) {
+  if (!token) return;
+  currentTab = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  $(`page-${page}`).classList.add('active');
+  
+  const pages = ['inventory','service','valuation','fuel','insurance','metrics'];
+  const idx = pages.indexOf(page);
+  if (idx !== -1) {
+    document.querySelectorAll('nav button')[idx].classList.add('active');
+  }
+  
+  if (loaders[page]) {
+    loaders[page]();
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Inventory Service
+// ─────────────────────────────────────────────
+async function loadInventory() {
+  try {
+    const data = await api('/api/inventory', 'GET', null, 'inventory');
+    const cars = data.cars || [];
+    const avail = cars.filter(c => c.status === 'available').length;
+    
+    const sumVal = cars.reduce((a,c) => a + c.price, 0);
+    const sumValText = sumVal >= 10000000 
+      ? (sumVal / 10000000).toFixed(2) + ' Cr' 
+      : (sumVal / 100000).toFixed(1) + ' Lakhs';
+
+    $('inv-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Fleet Size</div><div class="stat-val">${cars.length}</div></div>
+      <div class="stat"><div class="stat-label">Available</div><div class="stat-val" style="color:var(--green)">${avail}</div></div>
+      <div class="stat"><div class="stat-label">Sold</div><div class="stat-val" style="color:var(--red)">${cars.filter(c=>c.status==='sold').length}</div></div>
+      <div class="stat"><div class="stat-label">Reserved</div><div class="stat-val" style="color:var(--accent2)">${cars.filter(c=>c.status==='reserved').length}</div></div>
+      <div class="stat"><div class="stat-label">Portfolio Value</div><div class="stat-val">${formatINR(sumVal)}</div></div>`;
+      
+    $('inv-cards').innerHTML = cars.map(c => `
+      <div class="card">
+        <div class="card-img-container">
+          <img class="card-img" src="${c.image_url}" alt="${c.make} ${c.model}" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'">
+          <div class="card-img-overlay"></div>
+          <div style="position: absolute; top: 15px; right: 15px; z-index: 2;">
+            ${statusBadge(c.status)}
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-title">${c.year} ${c.make} ${c.model}</div>
+          <div class="card-meta">Color: <span>${c.color}</span></div>
+          <div class="card-meta">Odometer: <span>${c.mileage.toLocaleString()} km</span></div>
+          <div class="card-meta">Asset ID: <code style="color:var(--accent)">${c.id}</code></div>
+          <div style="margin-top: auto; padding-top: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+            <div class="card-value">${formatINR(c.price)}</div>
+            <button class="btn btn-sm btn-outline" style="width:auto;" onclick="deleteCar('${c.id}')">Remove</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch (err) {
+    $('inv-cards').innerHTML = `<div class="err">${err.message}</div>`;
+  }
+}
+
+async function addCar() {
+  const body = {
+    make: val('i-make'), 
+    model: val('i-model'), 
+    year: +val('i-year'), 
+    color: val('i-color'), 
+    mileage: +val('i-mileage'), 
+    price: +val('i-price'),
+    image_url: val('i-image_url')
+  };
+  
+  if (!body.make || !body.model || !body.price) {
+    $('inv-err').textContent = 'Make, Model and Price are required.'; 
+    $('inv-err').style.display = 'block'; 
+    return; 
+  }
+  
+  $('inv-err').style.display = 'none';
+  try {
+    await api('/api/inventory', 'POST', body, 'inventory');
+    
+    // Clear inputs
+    $('i-make').value = '';
+    $('i-model').value = '';
+    $('i-year').value = '';
+    $('i-color').value = '';
+    $('i-mileage').value = '';
+    $('i-price').value = '';
+    $('i-image_url').value = '';
+    loadInventory();
+  } catch (err) {
+    $('inv-err').textContent = err.message;
+    $('inv-err').style.display = 'block';
+  }
+}
+
+async function deleteCar(id) { 
+  try {
+    await api('/api/inventory/'+id, 'DELETE', null, 'inventory'); 
+    loadInventory(); 
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Service logs
+// ─────────────────────────────────────────────
+async function loadService() {
+  try {
+    const data = await api('/api/service', 'GET', null, 'service');
+    const recs = data.records || [];
+    
+    $('svc-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Total Task Records</div><div class="stat-val">${recs.length}</div></div>
+      <div class="stat"><div class="stat-label">Fleet Repair Spend</div><div class="stat-val" style="color:var(--red)">${formatINR(data.total_cost)}</div></div>
+      <div class="stat"><div class="stat-label">Avg Ticket Cost</div><div class="stat-val" style="color:var(--accent2)">${recs.length ? formatINR(data.total_cost/recs.length) : '₹0'}</div></div>`;
+    
+    $('svc-table').innerHTML = `<thead><tr><th>ID</th><th>Car Model</th><th>Maintenance Task</th><th>Log Date</th><th>Cost (INR)</th><th>Odometer</th><th>Next Due</th><th>Notes</th><th></th></tr></thead><tbody>`
+      + (recs.length ? recs.map(r=>`<tr>
+        <td><code style="color:var(--muted)">${r.id}</code></td>
+        <td><strong>${r.car?.make||''} ${r.car?.model||''}</strong> <small style="color:var(--muted)">(${r.car_id})</small></td>
+        <td><span class="badge badge-blue">${r.type}</span></td>
+        <td>${r.date}</td>
+        <td style="color:var(--green); font-weight: 600;">${formatINR(r.cost)}</td>
+        <td>${r.mileage ? r.mileage.toLocaleString() + ' km' : '-'}</td>
+        <td>${r.next_due_miles ? r.next_due_miles.toLocaleString() + ' km' : '-'}</td>
+        <td style="color:var(--muted); font-size:.85rem; max-width: 220px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${r.notes||''}</td>
+        <td><button class="btn btn-sm btn-outline" onclick="deleteService('${r.id}')">Delete</button></td>
+      </tr>`).join('') : `<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:2rem;">No service operations logged yet.</td></tr>`) + '</tbody>';
+  } catch (err) {
+    $('svc-table').innerHTML = `<tr><td colspan="9" class="err">${err.message}</td></tr>`;
+  }
+}
+
+async function addService() {
+  const body = {
+    car_id: val('s-car_id'), 
+    type: val('s-type'), 
+    cost: +val('s-cost'),
+    mileage: +val('s-mileage'),
+    next_due_miles: +val('s-next_due_miles'),
+    notes: val('s-notes')
+  };
+  
+  try {
+    await api('/api/service', 'POST', body, 'service');
+    $('s-car_id').value = '';
+    $('s-type').value = '';
+    $('s-cost').value = '';
+    $('s-mileage').value = '';
+    $('s-next_due_miles').value = '';
+    $('s-notes').value = '';
+    loadService();
+  } catch (err) {
+    alert("Failed to log service: " + err.message);
+  }
+}
+
+async function deleteService(id) {
+  try {
+    await api('/api/service/'+id, 'DELETE', null, 'service');
+    loadService();
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Valuations
+// ─────────────────────────────────────────────
+async function loadValuation() {
+  try {
+    const data = await api('/api/valuation', 'GET', null, 'valuation');
+    const vals = data.valuations || [];
+    
+    const totalVal = vals.reduce((a,c)=>a+c.market_value,0);
+    
+    $('val-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Assessed Vehicles</div><div class="stat-val">${vals.length}</div></div>
+      <div class="stat"><div class="stat-label">Current Resale Worth</div><div class="stat-val" style="color:var(--green)">${formatINR(totalVal)}</div></div>
+      <div class="stat"><div class="stat-label">Avg Asset Value</div><div class="stat-val">${vals.length ? formatINR(totalVal/vals.length) : '₹0'}</div></div>`;
+      
+    $('val-cards').innerHTML = vals.map(v => {
+      const loss = v.original_price - v.market_value;
+      return `
+      <div class="card">
+        <div class="card-img-container">
+          <img class="card-img" src="${v.image_url}" alt="${v.make} ${v.model}" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=600&q=80'">
+          <div class="card-img-overlay"></div>
+          <div style="position: absolute; top: 15px; right: 15px; z-index: 2;">
+            <span class="badge badge-red">-${v.depreciation_pct}% Depreciated</span>
+          </div>
+        </div>
+        <div class="card-content">
+          <div class="card-title">${v.year} ${v.make} ${v.model}</div>
+          <div class="card-meta">Age: <span>${v.age_years} years</span></div>
+          <div class="card-meta">Fleet Mileage: <span>${v.mileage.toLocaleString()} km</span></div>
+          <div class="card-meta">Original: <span>${formatINR(v.original_price)}</span></div>
+          <div class="card-meta">Total Depreciation: <span style="color:var(--red); font-weight:600;">-${formatINR(loss)}</span></div>
+          <div style="margin-top: auto; padding-top: 1.25rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Resale Value</div>
+            <div class="card-value">${formatINR(v.market_value)}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    $('val-cards').innerHTML = `<div class="err">${err.message}</div>`;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Fuel logs
+// ─────────────────────────────────────────────
+async function loadFuel() {
+  try {
+    const data = await api('/api/fuel', 'GET', null, 'fuel');
+    const logs = data.logs || [];
+    const stats = data.stats_by_car || {};
+    
+    let totalL = 0;
+    let totalC = 0;
+    Object.values(stats).forEach(s => {
+      totalL += s.total_litres;
+      totalC += s.total_cost;
+    });
+    
+    $('fuel-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Logged Refuels</div><div class="stat-val">${logs.length}</div></div>
+      <div class="stat"><div class="stat-label">Total Litres</div><div class="stat-val" style="color:var(--blue)">${totalL.toFixed(1)} L</div></div>
+      <div class="stat"><div class="stat-label">Total Cost</div><div class="stat-val" style="color:var(--red)">${formatINR(totalC)}</div></div>
+      <div class="stat"><div class="stat-label">Avg Fuel Rate</div><div class="stat-val">${logs.length ? formatINR(totalC/totalL) + '/L' : '₹0'}</div></div>`;
+      
+    $('fuel-table').innerHTML = `<thead><tr><th>ID</th><th>Car ID / Model</th><th>Fill Date</th><th>Litres</th><th>Fuel Price / Litre</th><th>Total Bill</th><th>Odometer</th><th>Tank Profile</th><th></th></tr></thead><tbody>`
+      + (logs.length ? logs.map(l=>`<tr>
+        <td><code style="color:var(--muted)">${l.id}</code></td>
+        <td><strong>${stats[l.car_id]?.car?.make||''} ${stats[l.car_id]?.car?.model||''}</strong> <small style="color:var(--muted)">(${l.car_id})</small></td>
+        <td>${l.date}</td>
+        <td>${l.litres} Litres</td>
+        <td>${formatINR(l.cost_per_litre)}/L</td>
+        <td style="color:var(--green); font-weight:600;">${formatINR(l.total_cost)}</td>
+        <td>${l.odometer ? l.odometer.toLocaleString() + ' km' : '-'}</td>
+        <td><span class="badge badge-green">${l.full_tank ? 'Full Tank' : 'Partial'}</span></td>
+        <td><button class="btn btn-sm btn-outline" onclick="deleteFuel('${l.id}')">Del</button></td>
+      </tr>`).join('') : `<tr><td colspan="9" style="text-align:center; color:var(--muted); padding:2rem;">No fuel fill-ups logged yet.</td></tr>`) + '</tbody>';
+  } catch (err) {
+    $('fuel-table').innerHTML = `<tr><td colspan="9" class="err">${err.message}</td></tr>`;
+  }
+}
+
+async function addFuel() {
+  const body = {
+    car_id: val('f-car_id'), 
+    litres: +val('f-litres'), 
+    cost_per_litre: +val('f-cost_per_litre'),
+    odometer: +val('f-odometer')
+  };
+  try {
+    await api('/api/fuel', 'POST', body, 'fuel');
+    $('f-car_id').value = '';
+    $('f-litres').value = '';
+    $('f-cost_per_litre').value = '';
+    $('f-odometer').value = '';
+    loadFuel();
+  } catch (err) {
+    alert("Failed to log fuel: " + err.message);
+  }
+}
+
+async function deleteFuel(id) {
+  try {
+    await api('/api/fuel/'+id, 'DELETE', null, 'fuel');
+    loadFuel();
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Insurance Manager
+// ─────────────────────────────────────────────
+async function loadInsurance() {
+  try {
+    const data = await api('/api/insurance', 'GET', null, 'insurance');
+    const policies = data.policies || [];
+    
+    $('ins-stats').innerHTML = `
+      <div class="stat"><div class="stat-label">Active Policies</div><div class="stat-val">${data.total}</div></div>
+      <div class="stat"><div class="stat-label">Annual premium Pool</div><div class="stat-val" style="color:var(--accent2)">${formatINR(data.total_annual_premium)}</div></div>
+      <div class="stat"><div class="stat-label">Expiring Soon (30d)</div><div class="stat-val" style="color:var(--red)">${data.expiring_soon}</div></div>`;
+      
+    $('ins-cards').innerHTML = policies.map(p => `
+      <div class="card">
+        <div class="card-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <span class="badge badge-blue">${p.provider}</span>
+            <span class="badge ${p.expiry_alert ? 'badge-red' : 'badge-green'}">${p.expiry_alert ? 'Expiring' : 'Active'}</span>
+          </div>
+          <div class="card-title">${p.car?.year||''} ${p.car?.make||''} ${p.car?.model||''}</div>
+          <div class="card-meta">Policy No: <span style="font-family:monospace; font-weight:700;">${p.policy_no}</span></div>
+          <div class="card-meta">Coverage: <span>${p.type}</span></div>
+          <div class="card-meta">Validity: <span style="font-size:0.8rem;">${p.start} to ${p.end}</span></div>
+          <div class="card-meta">Expiry Countdown: <span style="font-weight:600; color:${p.expiry_alert ? 'var(--red)' : 'var(--green)'}">${p.days_until_expiry} days left</span></div>
+          
+          <div style="margin-top:2rem; padding-top:1.25rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:0.75rem; text-transform:uppercase; color:var(--muted); font-weight:600;">Annual Premium</div>
+              <div style="font-size:1.6rem; font-weight:800; color:var(--accent2);">${formatINR(p.premium)}</div>
+            </div>
+            <button class="btn btn-sm btn-outline" style="width:auto;" onclick="deletePolicy('${p.id}')">Cancel</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch (err) {
+    $('ins-cards').innerHTML = `<div class="err">${err.message}</div>`;
+  }
+}
+
+async function addPolicy() {
+  const body = {
+    car_id: val('p-car_id'), 
+    provider: val('p-provider'), 
+    policy_no: val('p-policy_no'),
+    type: val('p-type'),
+    premium: +val('p-premium'),
+    start: val('p-start'),
+    end: val('p-end')
+  };
+  try {
+    await api('/api/insurance', 'POST', body, 'insurance');
+    $('p-car_id').value = '';
+    $('p-provider').value = '';
+    $('p-policy_no').value = '';
+    $('p-premium').value = '';
+    $('p-start').value = '';
+    $('p-end').value = '';
+    loadInsurance();
+  } catch (err) {
+    alert("Failed to attach policy: " + err.message);
+  }
+}
+
+async function deletePolicy(id) {
+  try {
+    await api('/api/insurance/'+id, 'DELETE', null, 'insurance');
+    loadInsurance();
+  } catch (err) {
+    alert("Cancel failed: " + err.message);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  System Metrics Performance Charts
+// ─────────────────────────────────────────────
+function updateMetricsUI(data) {
+  $('met-uptime').textContent = data.uptime_seconds + 's';
+  $('met-requests').textContent = data.requests.total;
+  $('met-cpu').textContent = data.system.cpu_usage.toFixed(1) + '%';
+  $('met-mem').textContent = data.system.memory_usage.toFixed(1) + '%';
+  
+  // Render Realtime CPU/Memory Line Chart
+  const ctxSys = $('chart-system').getContext('2d');
+  if (!systemChart) {
+    systemChart = new Chart(ctxSys, {
+      type: 'line',
+      data: {
+        labels: timeLabels,
+        datasets: [
+          {
+            label: 'CPU Load (%)',
+            data: systemCpuHistory,
+            borderColor: '#ff5722',
+            backgroundColor: 'rgba(255, 87, 34, 0.08)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          },
+          {
+            label: 'RAM Load (%)',
+            data: systemMemHistory,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { family: 'Outfit' } } },
+          x: { ticks: { color: '#94a3b8', font: { family: 'Outfit' } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#f1f5f9', font: { family: 'Outfit', size: 12 } } }
+        }
+      }
+    });
+  } else {
+    systemChart.data.labels = timeLabels;
+    systemChart.data.datasets[0].data = systemCpuHistory;
+    systemChart.data.datasets[1].data = systemMemHistory;
+    systemChart.update('none');
+  }
+  
+  // Render APIs volume/response times
+  const services = Object.keys(data.requests.by_service);
+  const volumes = services.map(s => data.requests.by_service[s].count);
+  const latencies = services.map(s => data.requests.by_service[s].avg_latency_ms);
+  
+  const ctxEnd = $('chart-endpoints').getContext('2d');
+  if (!endpointChart) {
+    endpointChart = new Chart(ctxEnd, {
+      type: 'bar',
+      data: {
+        labels: services,
+        datasets: [
+          {
+            label: 'Total Requests',
+            data: volumes,
+            backgroundColor: 'rgba(255, 179, 0, 0.55)',
+            borderColor: '#ffb300',
+            borderWidth: 1.5,
+            yAxisID: 'y'
+          },
+          {
+            label: 'Latency (ms)',
+            data: latencies,
+            backgroundColor: 'rgba(16, 185, 129, 0.55)',
+            borderColor: '#10b981',
+            borderWidth: 1.5,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            type: 'linear',
+            position: 'left',
+            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit' } },
+            title: { display: true, text: 'Requests', color: '#ffb300', font: { family: 'Outfit', weight: 'bold' } }
+          },
+          y1: {
+            type: 'linear',
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: '#94a3b8', font: { family: 'Outfit' } },
+            title: { display: true, text: 'Latency (ms)', color: '#10b981', font: { family: 'Outfit', weight: 'bold' } }
+          },
+          x: { ticks: { color: '#94a3b8', font: { family: 'Outfit' } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#f1f5f9', font: { family: 'Outfit', size: 12 } } }
+        }
+      }
+    });
+  } else {
+    endpointChart.data.labels = services;
+    endpointChart.data.datasets[0].data = volumes;
+    endpointChart.data.datasets[1].data = latencies;
+    endpointChart.update('none');
+  }
+  
+  // Render detail rows
+  let html = '';
+  // DB entries count
+  Object.keys(data.db).forEach(col => {
+    html += `<tr>
+      <td><code>/db/${col}</code></td>
+      <td><span class="badge badge-blue">Datastore Collection</span></td>
+      <td>-</td>
+      <td><strong>${data.db[col]}</strong> records</td>
+      <td><span class="badge badge-green">Healthy</span></td>
+    </tr>`;
+  });
+  
+  // Request counts per service
+  services.forEach(svc => {
+    const req = data.requests.by_service[svc];
+    let latColor = 'var(--green)';
+    let statusClass = 'badge-green';
+    let statusTxt = 'Optimal';
+    
+    if (req.avg_latency_ms > 100.0) {
+      latColor = 'var(--red)';
+      statusClass = 'badge-red';
+      statusTxt = 'Slow Response';
+    } else if (req.avg_latency_ms > 20.0) {
+      latColor = 'var(--accent2)';
+      statusClass = 'badge-yellow';
+      statusTxt = 'Acceptable';
+    }
+    
+    html += `<tr>
+      <td><code>/api/${svc}</code></td>
+      <td><span class="badge badge-blue">API Microservice</span></td>
+      <td><strong>${req.count}</strong> calls</td>
+      <td style="color:${latColor}; font-weight:700;">${req.avg_latency_ms.toFixed(2)} ms</td>
+      <td><span class="badge ${statusClass}">${statusTxt}</span></td>
+    </tr>`;
+  });
+  
+  $('met-table-body').innerHTML = html || '<tr><td colspan="5" class="loading">No request performance logged yet.</td></tr>';
+}
+
+async function loadMetrics() {
+  try {
+    const data = await api('/api/metrics', 'GET', null, 'metrics');
+    updateMetricsUI(data);
+  } catch (err) {
+    console.error("Metrics update error:", err);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Metrics Polling Loop
+// ─────────────────────────────────────────────
+async function pollMetrics() {
+  if (!token) return;
+  try {
+    const data = await api('/api/metrics', 'GET', null, 'metrics');
+    if (!data) return;
+    
+    const now = new Date().toLocaleTimeString();
+    timeLabels.push(now);
+    systemCpuHistory.push(data.system.cpu_usage);
+    systemMemHistory.push(data.system.memory_usage);
+    
+    if (timeLabels.length > MAX_HISTORY) {
+      timeLabels.shift();
+      systemCpuHistory.shift();
+      systemMemHistory.shift();
+    }
+    
+    let loadColor = 'var(--green)';
+    let loadTxt = 'Optimal';
+    if (data.system.cpu_usage > 85.0 || data.system.memory_usage > 90.0) {
+      loadColor = 'var(--red)';
+      loadTxt = 'Heavy Load';
+    } else if (data.system.cpu_usage > 50.0) {
+      loadColor = 'var(--accent2)';
+      loadTxt = 'Moderate Load';
+    }
+    $('quick-perf-indicator').innerHTML = `Server Health: <span style="color:${loadColor}">${loadTxt}</span> (CPU: ${data.system.cpu_usage.toFixed(0)}%)`;
+    
+    if (currentTab === 'metrics') {
+      updateMetricsUI(data);
+    }
+  } catch (err) {
+    console.error("Background metrics polling failed", err);
+    $('quick-perf-indicator').innerHTML = `Server Health: <span style="color:var(--red)">Offline</span>`;
+  }
+}
+
+// Loaders mapping
+const loaders = {
+  inventory: loadInventory,
+  service: loadService,
+  valuation: loadValuation,
+  fuel: loadFuel,
+  insurance: loadInsurance,
+  metrics: loadMetrics
+};
+
+// Initial triggers
+if (token) {
+  loadInventory();
+  pollMetrics();
+  setInterval(pollMetrics, 3000);
+} else {
+  // Check auth periodically or start polling once logged in
+  const checkAuthInterval = setInterval(() => {
+    if (token) {
+      clearInterval(checkAuthInterval);
+      loadInventory();
+      pollMetrics();
+      setInterval(pollMetrics, 3000);
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>

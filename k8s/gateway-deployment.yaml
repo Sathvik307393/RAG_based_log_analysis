@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autohub-gateway
+  namespace: autohub
+  labels:
+    app: autohub-gateway
+    tier: public
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: autohub-gateway
+  template:
+    metadata:
+      labels:
+        app: autohub-gateway
+        tier: public
+    spec:
+      containers:
+      - name: gateway
+        image: autohubacr.azurecr.io/autohub-gateway:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autohub-gateway-service
+  namespace: autohub
+  labels:
+    app: autohub-gateway
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: autohub-gateway
