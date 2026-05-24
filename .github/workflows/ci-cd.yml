@@ -7,9 +7,9 @@ on:
     branches: [ main ]
 
 env:
-  ACR_NAME: autohubacr
-  AKS_CLUSTER: autohub-aks
-  RESOURCE_GROUP: autohub-rg
+  ACR_NAME: loganalysisregistry
+  AKS_CLUSTER: log-analysis-cluster
+  RESOURCE_GROUP: log-analysis-rg
   TARGET_DOMAIN: https://your-domain.com # Configured for DAST targeting your custom domain
 
 jobs:
@@ -134,6 +134,14 @@ jobs:
     needs: [lint-and-test, sast-snyk, sast-sonarqube, build-and-trivy-scan, deploy-dry-run, dast-scan]
     if: failure()  # Only runs if any of the needed jobs fail
     steps:
+    - name: Fetch Failed Job Logs
+      run: |
+        echo "ERRORS<<EOF" >> $GITHUB_ENV
+        gh run view ${{ github.run_id }} --log-failed | tail -n 40 >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Send Failure Email
       uses: dawidd6/action-send-mail@v3
       with:
@@ -146,6 +154,12 @@ jobs:
           Hello SRE Team,
 
           The CI/CD pipeline for ${{ github.repository }} has FAILED!
+
+          --------------------------------------------------
+          🚨 RECENT ERROR LOG SNIPPET:
+          --------------------------------------------------
+          ${{ env.ERRORS }}
+          --------------------------------------------------
 
           Details:
           - Repository: https://github.com/${{ github.repository }}
