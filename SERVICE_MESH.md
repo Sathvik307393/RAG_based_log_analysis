@@ -10,13 +10,13 @@ You can enable the Istio add-on directly on your cluster:
 
 ```bash
 # 1. Enable the Istio mesh add-on
-az aks mesh enable --resource-group autohub-rg --name autohub-aks --revision asm-1-20
+az aks mesh enable --resource-group log_analysis-rg --name log-analysis-aks-cluster --revision asm-1-20
 
 # 2. Label your namespace to enable automatic sidecar injection
-kubectl label namespace autohub istio-injection=enabled
+kubectl label namespace log-analysis istio-injection=enabled
 
 # 3. Restart your deployment pods to inject the Envoy proxies
-kubectl rollout restart deployment -n autohub
+kubectl rollout restart deployment -n log-analysis
 ```
 
 Once restarted, each pod will run with an additional `istio-proxy` container that intercepts all inbound and outbound network traffic.
@@ -37,7 +37,7 @@ Standard container standard outputs only show basic application logs. The Envoy 
   "response_code": 503,
   "response_flags": "UH",
   "duration": 5005,
-  "upstream_service": "inventory-service.autohub.svc.cluster.local",
+  "upstream_service": "inventory-service.log-analysis.svc.cluster.local",
   "x-request-id": "abc123-trace-id-xyz"
 }
 ```
@@ -53,14 +53,14 @@ Standard container standard outputs only show basic application logs. The Envoy 
 With Istio, we can secure container communication without writing security logic in Python.
 
 ### Enforcing Strict Mutual TLS (mTLS)
-Apply this policy to force all services in the `autohub` namespace to communicate using encrypted TLS tunnels:
+Apply this policy to force all services in the `log-analysis` namespace to communicate using encrypted TLS tunnels:
 
 ```yaml
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
   name: default
-  namespace: autohub
+  namespace: log-analysis
 spec:
   mtls:
     mode: STRICT
@@ -74,7 +74,7 @@ apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
   name: allow-only-gateway
-  namespace: autohub
+  namespace: log-analysis
 spec:
   selector:
     matchLabels:
@@ -83,7 +83,7 @@ spec:
   rules:
   - from:
     - source:
-        principals: ["cluster.local/ns/autohub/sa/autohub-gateway-service-account"]
+        principals: ["cluster.local/ns/log-analysis/sa/autohub-gateway-service-account"]
 ```
 
 ---
@@ -100,7 +100,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: inventory-service-delay
-  namespace: autohub
+  namespace: log-analysis
 spec:
   hosts:
   - inventory-service
@@ -123,7 +123,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: auth-service-abort
-  namespace: autohub
+  namespace: log-analysis
 spec:
   hosts:
   - auth-service
@@ -149,7 +149,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: inventory-service-circuit-breaker
-  namespace: autohub
+  namespace: log-analysis
 spec:
   host: inventory-service
   trafficPolicy:

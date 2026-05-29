@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: deny-all-private-ingress
-  namespace: autohub
+  namespace: log-analysis
 spec:
   podSelector:
     matchLabels:
@@ -14,7 +14,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-gateway-to-backend
-  namespace: autohub
+  namespace: log-analysis
 spec:
   podSelector:
     matchLabels:
@@ -32,7 +32,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-internal-backend-mesh
-  namespace: autohub
+  namespace: log-analysis
 spec:
   podSelector:
     matchLabels:

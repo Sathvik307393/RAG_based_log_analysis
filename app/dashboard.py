@@ -705,7 +705,7 @@ def classify_devops_error(error_log):
 2. Verify that all database transactions release connections back to the pool promptly (e.g., utilizing try-with-resources or finally blocks).
 3. Restart the affected pod to instantly release locked database sessions:
    ```bash
-   kubectl rollout restart deployment/inventory-service -n autohub
+   kubectl rollout restart deployment/inventory-service -n log-analysis
    ```"""
         }
     elif any(kw in log_lower for kw in ["read timed out", "gateway timeout", "502 bad gateway", "504 gateway timeout", "readtimeout"]):
@@ -986,6 +986,44 @@ def fetch_github_workflow_status(anomaly_type="healthy"):
         if cli_res:
             return cli_res
         return generate_mock_workflow_status(anomaly_type)
+
+def get_job_diagnostic(job_name, steps):
+    failed_step = ""
+    for step in steps:
+        if step.get("conclusion") == "failure":
+            failed_step = step.get("name", "Unknown Step")
+            break
+            
+    source = "GitHub Actions Workflow Engine"
+    remedy = "Check pipeline definition or commit logs."
+    
+    name_lower = job_name.lower()
+    step_lower = failed_step.lower()
+    
+    if "lint" in name_lower or "lint" in step_lower:
+        source = "CI Lint Gate (flake8)"
+        remedy = "Run `flake8` locally, fix styling and syntax issues before committing."
+    elif "test" in name_lower or "test" in step_lower:
+        source = "Unit Tests runner (pytest)"
+        remedy = "Verify failures in pytest outputs and fix broken assertions."
+    elif "security" in name_lower or "snyk" in name_lower or "snyk" in step_lower:
+        source = "Snyk SAST Security Gate"
+        remedy = "Upgrade vulnerable dependencies in `requirements.txt` to recommended secure versions."
+    elif "build" in name_lower or "docker" in name_lower or "docker" in step_lower:
+        source = "Docker Build / Trivy Scanner"
+        remedy = "Ensure Dockerfile builds without errors and base images are secure (e.g. use alpine or -slim)."
+    elif "kubeconform" in name_lower or "manifest" in name_lower or "yaml" in step_lower:
+        source = "Kubeconform Manifest Validator"
+        remedy = "Fix yaml indentation or schema versions in the `k8s/` manifests."
+    elif "sonar" in name_lower or "quality" in name_lower:
+        source = "SonarQube Quality Gate"
+        remedy = "Verify cognitive complexity or code smells in SonarQube portal."
+        
+    return {
+        "failed_step": failed_step,
+        "source": source,
+        "remedy": remedy
+    }
 
 # ─────────────────────────────────────────────
 #  Local Mock Log Generator for Anomalies

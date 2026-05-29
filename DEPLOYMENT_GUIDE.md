@@ -116,7 +116,7 @@ Deploy the application within the Kubernetes cluster:
 
 ```bash
 # 1. Create the dedicated namespace
-kubectl create namespace autohub
+kubectl create namespace log-analysis
 
 # 2. Map AWS MongoDB endpoint in Cluster DNS
 kubectl apply -f k8s/database-external-service.yaml
@@ -132,7 +132,7 @@ kubectl apply -f k8s/gateway-deployment.yaml
 kubectl apply -f k8s/frontend-deployment.yaml
 
 # 6. Verify pods are running
-kubectl get pods -n autohub
+kubectl get pods -n log-analysis
 ```
 
 ---

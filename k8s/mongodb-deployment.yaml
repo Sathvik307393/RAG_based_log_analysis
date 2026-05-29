@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mongodb
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: mongodb
 spec:
@@ -37,7 +37,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: aws-db-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:

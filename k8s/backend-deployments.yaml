@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: auth-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: auth-service
     tier: private
@@ -28,7 +28,7 @@ spec:
         - name: PORT
           value: "8000"
         - name: MONGODB_URI
-          value: "mongodb://admin:secure_db_pass@aws-db-service.autohub.svc.cluster.local:27017/autohub?authSource=admin"
+          value: "mongodb://admin:secure_db_pass@aws-db-service.log-analysis.svc.cluster.local:27017/autohub?authSource=admin"
         resources:
           limits:
             cpu: "500m"
@@ -41,7 +41,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: auth-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -56,7 +56,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: inventory-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: inventory-service
     tier: private
@@ -93,7 +93,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: inventory-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -108,7 +108,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: maintenance-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: maintenance-service
     tier: private
@@ -147,7 +147,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: maintenance-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -162,7 +162,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: valuation-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: valuation-service
     tier: private
@@ -201,7 +201,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: valuation-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -216,7 +216,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: fuel-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: fuel-service
     tier: private
@@ -255,7 +255,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: fuel-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -270,7 +270,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: insurance-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: insurance-service
     tier: private
@@ -309,7 +309,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: insurance-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
@@ -324,7 +324,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: metrics-service
-  namespace: autohub
+  namespace: log-analysis
   labels:
     app: metrics-service
     tier: private
@@ -369,7 +369,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: metrics-service
-  namespace: autohub
+  namespace: log-analysis
 spec:
   type: ClusterIP
   ports:
