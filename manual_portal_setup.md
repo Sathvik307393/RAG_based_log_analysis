@@ -26,7 +26,7 @@ This service handles log embeddings generation and root-cause analysis synthesis
 3.  In the **Basics** tab, configure:
     *   **Resource Group**: Select `autohub-rg`.
     *   **Region**: Select **East US** (or the region chosen in Step 1).
-    *   **Name**: Enter `autohub-openai-sre` (must be unique).
+    *   **Name**: Enter `log-analysis-openai-sre` (must be unique).
     *   **Pricing tier**: Select **Standard S0**.
 4.  Click **Next** through the options, then click **Review + create** -> **Create**.
 5.  Once deployment completes, click **Go to resource**.
