@@ -1859,7 +1859,7 @@ with tab_chat:
                 answer = ""
                 citations = []
                 
-                is_pipeline_query = any(kw in query_to_run.lower() for kw in ["pipeline", "job", "workflow", "ci/cd", "ci-cd", "github action", "actions run", "current build", "build status"])
+                is_pipeline_query = any(kw in query_to_run.lower() for kw in ["pipeline", "job", "workflow", "ci/cd", "ci-cd", "github action", "actions run", "current build", "build status", "task", "run status", "what is being performed", "execution jobs", "current run"])
                 is_k8s_query = any(kw in query_to_run.lower() for kw in ["kubernetes", "k8s", "cluster", "pod", "deployment", "node", "namespace"])
                 
                 if is_pipeline_query:
