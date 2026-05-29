@@ -3,6 +3,8 @@ import sys
 import json
 import time
 
+# AutoHub SRE Control Center & Dashboard (Pushed to main for verification)
+
 # Ensure root directory is in Python path for importing modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
