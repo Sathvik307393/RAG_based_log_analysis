@@ -7,7 +7,7 @@ metadata:
     app: auth-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: auth-service
@@ -31,11 +31,11 @@ spec:
           value: "mongodb://admin:secure_db_pass@aws-db-service.log-analysis.svc.cluster.local:27017/autohub?authSource=admin"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -61,7 +61,7 @@ metadata:
     app: inventory-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: inventory-service
@@ -83,11 +83,11 @@ spec:
           value: "8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -113,7 +113,7 @@ metadata:
     app: maintenance-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: maintenance-service
@@ -137,11 +137,11 @@ spec:
           value: "http://inventory-service:8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -167,7 +167,7 @@ metadata:
     app: valuation-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: valuation-service
@@ -191,11 +191,11 @@ spec:
           value: "http://inventory-service:8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -221,7 +221,7 @@ metadata:
     app: fuel-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: fuel-service
@@ -245,11 +245,11 @@ spec:
           value: "http://inventory-service:8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -275,7 +275,7 @@ metadata:
     app: insurance-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: insurance-service
@@ -299,11 +299,11 @@ spec:
           value: "http://inventory-service:8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -329,7 +329,7 @@ metadata:
     app: metrics-service
     tier: private
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: metrics-service
@@ -359,11 +359,11 @@ spec:
           value: "http://insurance-service:8000"
         resources:
           limits:
-            cpu: "500m"
-            memory: "512Mi"
-          requests:
-            cpu: "250m"
+            cpu: "150m"
             memory: "256Mi"
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
 ---
 apiVersion: v1
 kind: Service
