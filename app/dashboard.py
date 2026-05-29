@@ -267,84 +267,121 @@ def start_simulation_thread():
 # Custom styles for premium dark-themed operational UI
 st.markdown("""
 <style>
+    /* Premium dark-themed operational UI backdrop */
     .stApp {
-        background-color: #0b0f19;
+        background: radial-gradient(circle at 50% 50%, #0e1322, #040712);
         color: #f1f5f9;
+        font-family: 'Outfit', 'Inter', system-ui, sans-serif;
     }
     .reportview-container .main .block-container {
         padding-top: 2rem;
     }
     h1 {
-        font-family: 'Barlow Condensed', sans-serif;
-        font-weight: 900;
+        font-family: 'Outfit', 'Barlow Condensed', sans-serif;
+        font-weight: 800;
         text-transform: uppercase;
-        color: #f1f5f9;
+        letter-spacing: 0.05em;
+        color: #ffffff;
         border-bottom: 2px solid #ff5722;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1.75rem;
+        text-shadow: 0 0 15px rgba(255, 87, 34, 0.2);
     }
     .metric-card {
-        background: rgba(18, 22, 35, 0.6);
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        padding: 1.5rem;
+        border-radius: 12px;
+        padding: 1.25rem;
         text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 87, 34, 0.4);
+        box-shadow: 0 8px 25px rgba(255, 87, 34, 0.15);
+    }
+    .stat-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+    }
+    .stat-val {
+        font-size: 1.8rem;
+        font-weight: 700;
+        font-family: 'Outfit', sans-serif;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     }
     .log-container {
-        font-family: 'Courier New', Courier, monospace;
-        background-color: #04070f;
-        color: #39ff14;
-        border-radius: 8px;
-        padding: 1rem;
-        height: 250px;
-        overflow-y: scroll;
-        border: 1px solid rgba(57, 255, 20, 0.2);
+        font-family: 'Fira Code', 'Courier New', Courier, monospace;
+        background-color: #03050a;
+        color: #10b981;
+        border-radius: 12px;
+        padding: 1.25rem;
+        height: 280px;
+        overflow-y: auto;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         margin-bottom: 1.5rem;
     }
     .log-line {
-        margin-bottom: 0.25rem;
-        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+        padding-bottom: 0.2rem;
     }
     @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 179, 0, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 179, 0, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 179, 0, 0); }
+        0% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(251, 191, 36, 0); }
+        100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
     }
     .dot-green {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background-color: #10b981;
+        box-shadow: 0 0 8px #10b981;
     }
     .dot-red {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background-color: #ef4444;
+        box-shadow: 0 0 8px #ef4444;
     }
     .dot-yellow {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        background-color: #ffb300;
-        animation: pulse 1.5s infinite;
+        background-color: #fbbf24;
+        animation: pulse 1.8s infinite;
     }
     .dot-grey {
         display: inline-block;
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         background-color: #64748b;
     }
     .pipeline-container {
-        background: rgba(18, 22, 35, 0.6);
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .pipeline-header {
         display: flex;
@@ -352,33 +389,42 @@ st.markdown("""
         align-items: center;
         border-bottom: 1px solid rgba(255,255,255,0.08);
         padding-bottom: 0.75rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
     }
     .pipeline-title {
-        font-family: 'Barlow Condensed', sans-serif;
+        font-family: 'Outfit', sans-serif;
         font-weight: 700;
         text-transform: uppercase;
         color: #ff5722;
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
     }
     .pipeline-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.75rem;
     }
     .pipeline-job-card {
-        background: rgba(4, 7, 15, 0.5);
+        background: rgba(2, 6, 23, 0.45);
         border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 0.75rem;
         text-align: left;
+        transition: all 0.2s ease;
+    }
+    .pipeline-job-card:hover {
+        background: rgba(2, 6, 23, 0.7);
+        border-color: rgba(99, 102, 241, 0.3);
     }
     .pipeline-job-name {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
-        margin-bottom: 0.25rem;
-        color: #f1f5f9;
+        margin-bottom: 0.35rem;
+        color: #e2e8f0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .pipeline-job-status {
         display: flex;
@@ -389,58 +435,67 @@ st.markdown("""
     }
     .k8s-pod-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 1.25rem;
         margin-bottom: 1.5rem;
     }
     .k8s-pod-card {
-        background: rgba(18, 22, 35, 0.6);
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        padding: 1rem;
+        border-radius: 12px;
+        padding: 1.25rem;
         position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .k8s-pod-card:hover {
-        border-color: rgba(255, 87, 34, 0.3);
-        box-shadow: 0 4px 15px rgba(255, 87, 34, 0.05);
+        transform: translateY(-4px);
+        border-color: rgba(255, 87, 34, 0.35);
+        box-shadow: 0 10px 30px rgba(255, 87, 34, 0.12);
     }
     .k8s-pod-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 0.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        padding-bottom: 0.25rem;
+        margin-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 0.5rem;
     }
     .k8s-pod-name {
         font-weight: 700;
         font-size: 0.85rem;
-        color: #f1f5f9;
+        color: #ffffff;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-        width: 140px;
+        max-width: 170px;
     }
     .k8s-pod-detail {
         font-size: 0.75rem;
         color: #94a3b8;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.4rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     .k8s-pod-metric {
         font-weight: 600;
-        color: #f1f5f9;
+        color: #e2e8f0;
     }
     .k8s-log-terminal {
-        font-family: 'Courier New', Courier, monospace;
+        font-family: 'Fira Code', 'Courier New', Courier, monospace;
         background-color: #03050a;
-        color: #00ff66;
-        border-radius: 6px;
-        padding: 0.75rem;
-        height: 250px;
-        overflow-y: scroll;
-        border: 1px solid rgba(0, 255, 102, 0.2);
-        font-size: 0.8rem;
-        line-height: 1.25rem;
+        color: #10b981;
+        border-radius: 10px;
+        padding: 1rem;
+        height: 260px;
+        overflow-y: auto;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        font-size: 0.75rem;
+        line-height: 1.4;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
     }
 </style>
 
@@ -1405,7 +1460,8 @@ tab_console, tab_k8s, tab_suggestions, tab_chat = st.tabs([
     "💬 AI SRE Chat Assistant"
 ])
 
-with tab_console:
+@st.fragment(run_every=refresh_interval if auto_refresh else None)
+def show_console_tab():
     st.markdown("A real-time operational RAG system connected to Azure Log Analytics, Event Hubs, and Azure AI Search.")
     
     # Stats Rows (Mocked based on Active Anomaly to look premium)
@@ -1635,8 +1691,12 @@ with tab_console:
     
     st.markdown(f'<div class="log-container">{log_html}</div>', unsafe_allow_html=True)
 
+with tab_console:
+    show_console_tab()
 
-with tab_k8s:
+
+@st.fragment(run_every=refresh_interval if auto_refresh else None)
+def show_k8s_tab():
     st.markdown("### ☸️ Kubernetes Pod Cluster Watch")
     st.markdown("Monitor real-time pod replicas status, network configurations, and resource consumptions across the fleet.")
     
@@ -1687,13 +1747,13 @@ with tab_k8s:
 <span class="k8s-pod-name" title="{pod['name']}">{pod['name']}</span>
 <span class="{health_class}" title="Health: {pod['health']}"></span>
 </div>
-<div class="k8s-pod-detail"><strong>Status:</strong> {pod['status']}</div>
-<div class="k8s-pod-detail"><strong>Probes:</strong> {pod['probe']}</div>
-<div class="k8s-pod-detail"><strong>Restarts:</strong> {pod['restarts']}</div>
-<div class="k8s-pod-detail"><strong>Age:</strong> {pod['age']}</div>
-<div class="k8s-pod-detail"><strong>CPU:</strong> <span style="color:{cpu_color}; font-weight:bold;">{pod['cpu']}%</span></div>
-<div class="k8s-pod-detail"><strong>Mem:</strong> <span style="color:{mem_color}; font-weight:bold;">{int(pod['mem'])}MB</span> / {pod['max_mem']}MB</div>
-<div class="k8s-pod-detail" style="font-size:0.7rem; color:#64748b; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{pod['message']}">{pod['message']}</div>
+<div class="k8s-pod-detail"><span>Status:</span> <span class="k8s-pod-metric">{pod['status']}</span></div>
+<div class="k8s-pod-detail"><span>Probes:</span> <span class="k8s-pod-metric">{pod['probe']}</span></div>
+<div class="k8s-pod-detail"><span>Restarts:</span> <span class="k8s-pod-metric">{pod['restarts']}</span></div>
+<div class="k8s-pod-detail"><span>Age:</span> <span class="k8s-pod-metric">{pod['age']}</span></div>
+<div class="k8s-pod-detail"><span>CPU:</span> <span style="color:{cpu_color}; font-weight:bold;">{pod['cpu']}%</span></div>
+<div class="k8s-pod-detail"><span>Mem:</span> <span style="color:{mem_color}; font-weight:bold;">{int(pod['mem'])}MB / {pod['max_mem']}MB</span></div>
+<div style="font-size:0.7rem; color:#64748b; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.5rem; border-top:1px solid rgba(255,255,255,0.03); padding-top:0.25rem;" title="{pod['message']}">{pod['message']}</div>
 </div>"""
         pod_cards_html += card_html
         
@@ -1748,6 +1808,9 @@ with tab_k8s:
                 height=250
             )
             st.plotly_chart(fig, use_container_width=True)
+
+with tab_k8s:
+    show_k8s_tab()
 
 
 with tab_suggestions:
@@ -2071,10 +2134,4 @@ If you are currently troubleshooting an incident, please select an anomaly scena
 
 
 # Start the background simulator thread after all functions and variables are loaded
-start_simulation_thread()
-
-# Real-Time Auto-Refresh Loop
-if auto_refresh:
-    time.sleep(refresh_interval)
-    st.rerun()
 start_simulation_thread()
