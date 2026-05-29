@@ -103,23 +103,43 @@ Event Hubs ingest log streams from backend microservices.
 
 ---
 
-## Step 6: Create Azure Kubernetes Service (AKS) Cluster
+## Step 6: Create Azure Container Registry (ACR)
+Stores the Docker images for all the microservices (`frontend`, `gateway`, `auth-service`, etc.).
+
+1.  Search for **Container registries** in the top search bar and click on it.
+2.  Click **+ Create**.
+3.  Configure the settings:
+    *   **Resource Group**: Select `autohub-rg`.
+    *   **Registry name**: Enter a unique name, e.g., `autohubregistry` (lowercase, alphanumeric only).
+    *   **Location**: Select **East US**.
+    *   **Pricing plan**: Select **Basic** (cost-efficient, perfect for testing).
+4.  Click **Review + create** -> **Create**.
+5.  Enable Admin User (for easy command-line login):
+    *   Once deployed, navigate to the ACR resource.
+    *   Under **Settings**, click **Access keys**.
+    *   Toggle **Admin user** to **Enabled** (this displays the username and passwords to log in locally via `docker login`).
+
+---
+
+## Step 7: Create Azure Kubernetes Service (AKS) Cluster
 This cluster hosts the microservice pods (`gateway`, `auth-service`, etc.).
 
 1.  Search for **Kubernetes services** in the top search bar and click on it.
 2.  Click **+ Create** -> select **Create a Kubernetes cluster**.
-3.  Configure settings:
+3.  Configure settings in the **Basics** tab:
     *   **Resource Group**: Select `autohub-rg`.
     *   **Cluster preset configuration**: Select **Dev/Test** (optimal for cost).
     *   **Kubernetes cluster name**: Enter `autohub-aks-cluster`.
     *   **Region**: Select **East US**.
     *   **Primary node pool size**: Click *Change size* -> select **Standard_DS2_v2** (2 vCPUs, 7 GB RAM).
     *   **Scale method**: Select **Manual**, and set **Node count** to `1` (sufficient for testing and saves cost).
-4.  Click **Review + create** -> **Create** (this take 4-7 minutes).
+4.  Click **Next: Node pools**, **Next: Networking**, and proceed to the **Integrations** tab:
+    *   Under **Container registry**, select the ACR you created in Step 6 (e.g., `autohubregistry`). This automatically links them and grants the AKS cluster access to pull images.
+5.  Click **Review + create** -> **Create** (this takes 4-7 minutes).
 
 ---
 
-## Step 7: Create Azure Function App
+## Step 8: Create Azure Function App
 Processes raw logs from the Event Hub and uploads vector records to AI Search.
 
 1.  Search for **Function App** in the top search bar and click on it.
@@ -137,11 +157,11 @@ Processes raw logs from the Event Hub and uploads vector records to AI Search.
 
 ---
 
-## Step 8: Retrieve Configuration Keys for your `.env` File
+## Step 9: Retrieve Configuration Keys for your `.env` File
 Now collect the keys from the portal and write them to your local [`.env`](file:///c:/Users/ASUS/OneDrive/Desktop/Log-Analysis/.env) file.
 
 ### 1. Azure OpenAI Keys
-*   Go to **Azure OpenAI** -> select `autohub-openai-sre` -> click **Keys and Endpoint** (under Resource Management).
+*   Go to **Azure OpenAI** -> select `log-analysis-openai-sre` -> click **Keys and Endpoint** (under Resource Management).
 *   Copy **KEY 1** and paste it into `AZURE_OPENAI_API_KEY`.
 *   Copy the **Endpoint** URL and paste it into `AZURE_OPENAI_ENDPOINT`.
 
