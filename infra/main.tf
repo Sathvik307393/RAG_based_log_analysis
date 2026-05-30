@@ -41,7 +41,7 @@ resource "azurerm_role_assignment" "aks_acr_pull" {
 # 4. Azure OpenAI Service & Model Deployments
 resource "azurerm_cognitive_account" "openai" {
   name                = var.openai_name
-  location            = azurerm_resource_group.rg.location
+  location            = "swedencentral"
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "OpenAI"
   sku_name            = "S0"
@@ -53,10 +53,10 @@ resource "azurerm_cognitive_deployment" "chat" {
   model {
     format  = "OpenAI"
     name    = var.openai_chat_model_name
-    version = "2024-05-13"
+    version = "2024-11-20"
   }
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -68,8 +68,8 @@ resource "azurerm_cognitive_deployment" "embedding" {
     name    = var.openai_embedding_model_name
     version = "1"
   }
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -117,14 +117,8 @@ resource "azurerm_eventhub" "eh" {
   message_retention   = 1
 }
 
-resource "azurerm_eventhub_namespace_authorization_rule" "eh_ns_auth" {
-  name                = "RootManageSharedAccessKey"
-  namespace_name      = azurerm_eventhub_namespace.eh_ns.name
-  resource_group_name = azurerm_resource_group.rg.name
-  listen              = true
-  send                = true
-  manage              = true
-}
+
+
 
 # 8. App Service Plan for Function App (Linux Consumption)
 resource "azurerm_service_plan" "asp" {
@@ -162,6 +156,6 @@ resource "azurerm_linux_function_app" "fa" {
     "AZURE_SEARCH_ADMIN_KEY"            = azurerm_search_service.search.primary_key
     "AZURE_SEARCH_INDEX_NAME"           = "devops-logs-index"
     "AZURE_STORAGE_CONNECTION_STRING"   = azurerm_storage_account.storage.primary_connection_string
-    "EventHubConnectionString"          = azurerm_eventhub_namespace_authorization_rule.eh_ns_auth.primary_connection_string
+    "EventHubConnectionString"          = azurerm_eventhub_namespace.eh_ns.default_primary_connection_string
   }
 }

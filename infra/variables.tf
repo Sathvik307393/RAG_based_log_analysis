@@ -13,13 +13,13 @@ variable "location" {
 variable "acr_name" {
   type        = string
   description = "The name of the Azure Container Registry. Must be globally unique, alphanumeric only."
-  default     = "loganalysisregistry"
+  default     = "loganalysisregistrysrev2"
 }
 
 variable "storage_account_name" {
   type        = string
   description = "The name of the Azure Storage Account. Must be globally unique, lowercase alphanumeric only, between 3 and 24 characters."
-  default     = "loganalysisstoragesre"
+  default     = "loganalysisstoragesrev2"
 }
 
 variable "eventhub_namespace_name" {
@@ -37,13 +37,13 @@ variable "eventhub_name" {
 variable "openai_name" {
   type        = string
   description = "The name of the Azure OpenAI Service."
-  default     = "log-analysis-openai-sre"
+  default     = "log-analysis-openai-sre-v2"
 }
 
 variable "search_name" {
   type        = string
   description = "The name of the Azure AI Search Service."
-  default     = "log-analysis-search-sre"
+  default     = "log-analysis-search-sre-v2"
 }
 
 variable "function_app_name" {
@@ -61,7 +61,7 @@ variable "aks_name" {
 variable "aks_vm_size" {
   type        = string
   description = "The size of the Virtual Machine for the AKS node pool."
-  default     = "Standard_DS2_v2"
+  default     = "Standard_D2s_v3"
 }
 
 variable "openai_chat_model_deployment" {
