@@ -9,7 +9,7 @@ import time
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dotenv import load_dotenv
-load_dotenv()  # Load environment variables from .env
+load_dotenv(override=True)  # Load environment variables from .env and override cached process envs
 from datetime import datetime, timedelta
 import requests
 import streamlit as st
