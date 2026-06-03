@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  ACR_NAME: 'loganalysisregistry'
+  ACR_NAME: 'loganalysisregistrysrev2'
   AKS_CLUSTER: 'autohub-aks'
   RESOURCE_GROUP: 'autohub-rg'
   TARGET_DOMAIN: 'https://your-domain.com'

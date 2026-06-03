@@ -21,7 +21,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: frontend
-        image: loganalysisregistry.azurecr.io/autohub-frontend:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-frontend:latest
         ports:
         - containerPort: 80
         resources:

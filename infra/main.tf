@@ -41,7 +41,7 @@ resource "azurerm_role_assignment" "aks_acr_pull" {
 # 4. Azure OpenAI Service & Model Deployments
 resource "azurerm_cognitive_account" "openai" {
   name                = var.openai_name
-  location            = "swedencentral"
+  location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   kind                = "OpenAI"
   sku_name            = "S0"
@@ -56,7 +56,7 @@ resource "azurerm_cognitive_deployment" "chat" {
     version = "2024-11-20"
   }
   sku {
-    name = "Standard"
+    name = "GlobalStandard"
   }
 }
 

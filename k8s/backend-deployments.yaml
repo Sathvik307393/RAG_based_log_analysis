@@ -21,7 +21,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: auth-service
-        image: loganalysisregistry.azurecr.io/autohub-auth-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-auth-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -75,7 +75,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: inventory-service
-        image: loganalysisregistry.azurecr.io/autohub-inventory-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-inventory-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -127,7 +127,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: maintenance-service
-        image: loganalysisregistry.azurecr.io/autohub-maintenance-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-maintenance-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -181,7 +181,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: valuation-service
-        image: loganalysisregistry.azurecr.io/autohub-valuation-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-valuation-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -235,7 +235,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: fuel-service
-        image: loganalysisregistry.azurecr.io/autohub-fuel-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-fuel-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -289,7 +289,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: insurance-service
-        image: loganalysisregistry.azurecr.io/autohub-insurance-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-insurance-service:latest
         ports:
         - containerPort: 8000
         env:
@@ -343,7 +343,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: metrics-service
-        image: loganalysisregistry.azurecr.io/autohub-metrics-service:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-metrics-service:latest
         ports:
         - containerPort: 8000
         env:

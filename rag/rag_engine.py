@@ -11,7 +11,7 @@ from langchain_core.output_parsers import StrOutputParser
 AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
 AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
-CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4o")
+CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.3-chat")
 EMBEDDING_DEPLOYMENT = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-large")
 
 AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_SERVICE_ENDPOINT")
@@ -95,6 +95,34 @@ class LogRageEngine:
                 "answer": f"Retrieval Error: Could not connect to Azure AI Search. Details: {str(e)}",
                 "citations": []
             }
+
+        if not retrieved_logs:
+            # Fallback to loading local logs so GPT-4o has actual telemetry context
+            import json
+            # Find project root directory containing local_logs.json
+            current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            local_logs_path = os.path.join(current_dir, "local_logs.json")
+            if not os.path.exists(local_logs_path):
+                local_logs_path = "local_logs.json"
+                
+            if os.path.exists(local_logs_path):
+                try:
+                    with open(local_logs_path, "r") as f:
+                        local_logs = json.load(f)
+                    if local_logs:
+                        # Try to find logs matching query keywords
+                        keywords = [w.lower() for w in query.split() if len(w) > 3]
+                        matched = []
+                        if keywords:
+                            for log in local_logs:
+                                msg = log.get("message", "").lower()
+                                svc = log.get("service", "").lower()
+                                if any(kw in msg or kw in svc for kw in keywords):
+                                    matched.append(log)
+                        # Fallback to latest 30 logs if no keyword match
+                        retrieved_logs = matched[-30:] if matched else local_logs[-30:]
+                except Exception:
+                    pass
 
         if not retrieved_logs:
             return {

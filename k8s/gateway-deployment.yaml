@@ -21,7 +21,7 @@ spec:
       - name: acr-pull-secret
       containers:
       - name: gateway
-        image: loganalysisregistry.azurecr.io/autohub-gateway:latest
+        image: loganalysisregistrysrev2.azurecr.io/autohub-gateway:latest
         ports:
         - containerPort: 5000
         resources:

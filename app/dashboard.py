@@ -264,6 +264,11 @@ def start_simulation_thread():
     t.start()
 
 
+# Inject Font Awesome via a proper link tag (CSS @import is stripped by Streamlit)
+st.markdown("""
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
+""", unsafe_allow_html=True)
+
 # Custom styles for premium dark-themed operational UI
 st.markdown("""
 <style>
@@ -287,11 +292,79 @@ st.markdown("""
         margin-bottom: 1.75rem;
         text-shadow: 0 0 15px rgba(255, 87, 34, 0.2);
     }
+    
+    /* Sleek Custom Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background-color: rgba(15, 23, 42, 0.35);
+        padding: 6px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 1.5rem;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 40px;
+        white-space: pre-wrap;
+        background-color: transparent;
+        border-radius: 8px;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 0 16px;
+        border: none !important;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: rgba(255, 255, 255, 0.03);
+        color: #ffffff;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: rgba(99, 102, 241, 0.15) !important;
+        color: #818cf8 !important;
+        border: 1px solid rgba(99, 102, 241, 0.3) !important;
+        font-weight: 700;
+    }
+    
+    /* custom warning/success alerts */
+    .custom-alert {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.25rem;
+        font-size: 0.85rem;
+    }
+    .custom-alert.success {
+        border-left: 4px solid #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        background: rgba(16, 185, 129, 0.05);
+        color: #cbd5e1;
+    }
+    .custom-alert.warning {
+        border-left: 4px solid #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.15);
+        background: rgba(251, 191, 36, 0.05);
+        color: #cbd5e1;
+    }
+    .alert-icon {
+        font-size: 1.1rem;
+    }
+    .alert-content code {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+
+    /* Metric Cards */
     .metric-card {
-        background: rgba(15, 23, 42, 0.55);
+        background: rgba(15, 23, 42, 0.5);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
         padding: 1.25rem;
         text-align: center;
@@ -299,24 +372,52 @@ st.markdown("""
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .metric-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(255, 87, 34, 0.4);
-        box-shadow: 0 8px 25px rgba(255, 87, 34, 0.15);
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+    .metric-card.blue {
+        border-top: 3px solid #3b82f6;
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.03);
+    }
+    .metric-card.blue:hover {
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    .metric-card.green {
+        border-top: 3px solid #10b981;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.03);
+    }
+    .metric-card.green:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    .metric-card.orange {
+        border-top: 3px solid #ff5722;
+        box-shadow: 0 4px 20px rgba(255, 87, 34, 0.03);
+    }
+    .metric-card.orange:hover {
+        border-color: rgba(255, 87, 34, 0.3);
+    }
+    .metric-card.amber {
+        border-top: 3px solid #fbbf24;
+        box-shadow: 0 4px 20px rgba(251, 191, 36, 0.03);
+    }
+    .metric-card.amber:hover {
+        border-color: rgba(251, 191, 36, 0.3);
     }
     .stat-label {
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: 0.72rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         color: #94a3b8;
         margin-bottom: 0.5rem;
     }
     .stat-val {
-        font-size: 1.8rem;
-        font-weight: 700;
+        font-size: 1.6rem;
+        font-weight: 800;
         font-family: 'Outfit', sans-serif;
         color: #ffffff;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
     .log-container {
         font-family: 'Fira Code', 'Courier New', Courier, monospace;
@@ -342,6 +443,103 @@ st.markdown("""
         70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(251, 191, 36, 0); }
         100% { transform: scale(0.92); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
     }
+    
+    /* Kubernetes Status Badges */
+    .k8s-badge {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 6px;
+        display: inline-block;
+        letter-spacing: 0.03em;
+        text-align: center;
+        min-width: 75px;
+    }
+    .k8s-badge.running {
+        background-color: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .k8s-badge.degraded {
+        background-color: rgba(251, 191, 36, 0.12);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        animation: pulse 1.8s infinite;
+    }
+    .k8s-badge.failed, .k8s-badge.error, .k8s-badge.crashloopbackoff {
+        background-color: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Terminal window styles */
+    .terminal-window {
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        margin-bottom: 1.5rem;
+    }
+    .terminal-header {
+        background-color: #1e293b;
+        padding: 0.6rem 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .terminal-buttons {
+        display: flex;
+        gap: 6px;
+    }
+    .t-btn {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .t-btn.red { background-color: #ef4444; }
+    .t-btn.yellow { background-color: #fbbf24; }
+    .t-btn.green { background-color: #10b981; }
+    .terminal-title {
+        color: #94a3b8;
+        font-size: 0.72rem;
+        font-family: 'Fira Code', monospace;
+    }
+    .terminal-status {
+        background-color: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        letter-spacing: 0.05em;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+    .terminal-body {
+        font-family: 'Fira Code', 'Courier New', Courier, monospace;
+        background-color: #05070f;
+        color: #cbd5e1;
+        padding: 1.25rem;
+        overflow-y: auto;
+        font-size: 0.76rem;
+        line-height: 1.5;
+        border-top: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    .terminal-body::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .terminal-body::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .terminal-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+    }
+
     .dot-green {
         display: inline-block;
         width: 10px;
@@ -374,10 +572,10 @@ st.markdown("""
         background-color: #64748b;
     }
     .pipeline-container {
-        background: rgba(15, 23, 42, 0.55);
+        background: rgba(15, 23, 42, 0.5);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
@@ -497,9 +695,365 @@ st.markdown("""
         line-height: 1.4;
         box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
     }
-</style>
+    
+    /* Professional Chatbot UI Styles */
+    .chat-welcome-container {
+        text-align: center;
+        padding: 2.5rem 1rem;
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+    .chat-welcome-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .chat-welcome-subtitle {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+    .chat-suggestion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .chat-suggestion-card {
+        background: rgba(2, 6, 23, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+    }
+    .chat-suggestion-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(99, 102, 241, 0.4);
+        background: rgba(99, 102, 241, 0.05);
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+    }
+    .chat-suggestion-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .chat-suggestion-desc {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        line-height: 1.4;
+    }
+    .chat-bubble-user {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.05));
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-left: 4px solid #6366f1;
+        border-radius: 4px 16px 16px 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .chat-bubble-assistant {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.45), rgba(30, 41, 59, 0.2));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-left: 4px solid #10b981;
+        border-radius: 4px 16px 16px 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .chat-role-header {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .chat-citation-header {
+        margin-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 0.75rem;
+    }
+    .chat-citation-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+    .chat-citation-console {
+        background-color: #03050a;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .chat-citation-row {
+        font-family: 'Fira Code', monospace;
+        font-size: 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.02);
+        padding: 6px 0;
+        line-height: 1.4;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    .chat-citation-row:last-child {
+        border-bottom: none;
+    }
+    .chat-citation-time {
+        color: #64748b;
+    }
+    .chat-citation-level {
+        font-weight: bold;
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+    }
+    .chat-citation-service {
+        color: #ff5722;
+        font-weight: 600;
+    }
+    .chat-citation-msg {
+        color: #e2e8f0;
+        flex-grow: 1;
+    }
+    
+    /* Compact Pod Directory Table Styles */
+    .pod-table-container {
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        margin-bottom: 1.5rem;
+        height: 380px;
+        overflow-y: auto;
+    }
+    .pod-table-container::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .pod-table-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 4px;
+    }
+    .pod-table-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+    }
+    .pod-table-container::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+    .pod-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.8rem;
+    }
+    .pod-table th {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        letter-spacing: 0.08em;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+        padding: 0.75rem 0.5rem;
+        font-size: 0.7rem;
+    }
+    .pod-table td {
+        padding: 0.8rem 0.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+        color: #e2e8f0;
+    }
+    .pod-table tr {
+        transition: background-color 0.2s ease;
+    }
+    .pod-table tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .pod-table tr:last-child td {
+        border-bottom: none;
+    }
+    .pod-table-name {
+        font-family: 'Fira Code', monospace;
+        font-weight: 600;
+        color: #ffffff;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .pod-table-badge {
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+    }
+    .progress-bar-container {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+        height: 6px;
+        width: 80px;
+        overflow: hidden;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 0.5rem;
+    }
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
 
+    /* Main Tab Headers Icon Injection */
+    div.stTabs:first-of-type > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(1)::before {
+        content: "\f080"; /* fa-chart-column */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+    div.stTabs:first-of-type > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(2)::before {
+        content: "\f3b6"; /* fa-kubernetes */
+        font-family: "Font Awesome 6 Brands";
+        font-weight: 400;
+        margin-right: 8px;
+    }
+    div.stTabs:first-of-type > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(3)::before {
+        content: "\f0eb"; /* fa-lightbulb */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+    div.stTabs:first-of-type > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(4)::before {
+        content: "\f075"; /* fa-comments */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+
+    /* Nested Tab Headers Icon Injection */
+    div[data-testid="stTab"] div.stTabs > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(1)::before {
+        content: "\f0ad"; /* fa-wrench */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+    div[data-testid="stTab"] div.stTabs > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(2)::before {
+        content: "\f135"; /* fa-rocket */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+    div[data-testid="stTab"] div.stTabs > div[data-baseweb="tab-list"] button[data-baseweb="tab"]:nth-child(3)::before {
+        content: "\f201"; /* fa-chart-line */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 8px;
+    }
+
+    /* Proactive Alerts Expanders with Left Borders and Alert Icons */
+    .incident-container-critical .stExpander {
+        border-left: 4px solid #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.02) !important;
+    }
+    .incident-container-critical .stExpander details summary::before {
+        content: "\f071"; /* fa-triangle-exclamation */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #ef4444;
+        margin-right: 8px;
+    }
+    .incident-container-warning .stExpander {
+        border-left: 4px solid #fbbf24 !important;
+        background-color: rgba(251, 191, 36, 0.02) !important;
+    }
+    .incident-container-warning .stExpander details summary::before {
+        content: "\f071"; /* fa-triangle-exclamation */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #fbbf24;
+        margin-right: 8px;
+    }
+    .cited-logs-container .stExpander details summary::before {
+        content: "\f1c0"; /* fa-database */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #94a3b8;
+        margin-right: 8px;
+    }
+
+    /* Suggestion Expander Icons */
+    .suggestion-expander details summary::before {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 10px;
+        color: #ff5722;
+        font-size: 1rem;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .suggestion-expander.lint-icon details summary::before { content: "\f121"; color: #38bdf8; }
+    .suggestion-expander.test-icon details summary::before { content: "\f492"; color: #a855f7; }
+    .suggestion-expander.sast-icon details summary::before { content: "\f3ed"; color: #ef4444; }
+    .suggestion-expander.quality-icon details summary::before { content: "\f559"; color: #eab308; }
+    .suggestion-expander.yaml-icon details summary::before { content: "\f1c9"; color: #34d399; }
+    .suggestion-expander.docker-icon details summary::before { content: "\f395"; font-family: "Font Awesome 6 Brands"; font-weight: 400; color: #0db7ed; }
+    .suggestion-expander.network-icon details summary::before { content: "\f6ff"; color: #6366f1; }
+    .suggestion-expander.db-icon details summary::before { content: "\f1c0"; color: #f97316; }
+    .suggestion-expander.timeout-icon details summary::before { content: "\f017"; color: #fbbf24; }
+    .suggestion-expander.oom-icon details summary::before { content: "\f2db"; color: #ec4899; }
+    .suggestion-expander.probe-icon details summary::before { content: "\f21e"; color: #10b981; }
+    .suggestion-expander.brute-icon details summary::before { content: "\f505"; color: #ef4444; }
+</style>
 """, unsafe_allow_html=True)
+
+def clean_html(html_str):
+    return "\n".join([line.strip() for line in html_str.split("\n")])
+
+def colorize_logs(log_text):
+    import html
+    lines = log_text.split("\n")
+    colored_lines = []
+    for line in lines:
+        if not line.strip():
+            continue
+        escaped_line = html.escape(line)
+        if "ERROR" in line or "java.sql" in line or "Exception" in line or "Failed" in line or "Actuator Health Check Failed" in line:
+            escaped_line = f'<span style="color:#ef4444; font-weight:500;">{escaped_line}</span>'
+        elif "WARN" in line or "Liveness probe failed" in line or "Readiness probe failed" in line:
+            escaped_line = f'<span style="color:#fbbf24; font-weight:500;">{escaped_line}</span>'
+        elif "INFO" in line:
+            escaped_line = f'<span style="color:#34d399;">{escaped_line}</span>'
+        else:
+            escaped_line = f'<span style="color:#94a3b8;">{escaped_line}</span>'
+        colored_lines.append(escaped_line)
+    return "<br>".join(colored_lines)
+
 
 
 # Local logs storage helpers
@@ -535,6 +1089,47 @@ def get_real_k8s_pods():
     import re
     from datetime import datetime
     try:
+        # First, query kubectl top pod to get real metrics
+        metrics_dict = {}
+        try:
+            metrics_res = subprocess.run(
+                ["kubectl", "top", "pod", "-n", "log-analysis", "--no-headers"],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            if metrics_res.returncode == 0:
+                for line in metrics_res.stdout.strip().split("\n"):
+                    parts = line.split()
+                    if len(parts) >= 3:
+                        pod_name = parts[0]
+                        cpu_str = parts[1]  # e.g., "5m"
+                        mem_str = parts[2]  # e.g., "48Mi"
+                        
+                        # Parse CPU (millicores -> percentage assuming 1 core = 1000m)
+                        cpu_val = 0.0
+                        if cpu_str.endswith("m"):
+                            try:
+                                cpu_val = round(float(cpu_str[:-1]) / 10.0, 1)
+                            except:
+                                pass
+                        
+                        # Parse Memory (Mi/Ki/Gi -> MB)
+                        mem_val = 0.0
+                        if mem_str.endswith("Mi"):
+                            try: mem_val = float(mem_str[:-2])
+                            except: pass
+                        elif mem_str.endswith("Gi"):
+                            try: mem_val = float(mem_str[:-2]) * 1024
+                            except: pass
+                        elif mem_str.endswith("Ki"):
+                            try: mem_val = float(mem_str[:-2]) / 1024
+                            except: pass
+                            
+                        metrics_dict[pod_name] = {"cpu": cpu_val, "mem": mem_val}
+        except Exception:
+            pass
+
         res = subprocess.run(
             ["kubectl", "get", "pods", "-n", "log-analysis", "-o", "json"],
             capture_output=True,
@@ -612,14 +1207,20 @@ def get_real_k8s_pods():
                 match_mem = re.search(r"(\d+)", mem_limit)
                 if match_mem:
                     max_mem = int(match_mem.group(1))
+                    if "Gi" in mem_limit:
+                        max_mem = max_mem * 1024
             
             cpu = 0.0
             mem = 0.0
             health = "Healthy"
             if status == "Running":
-                import random
-                cpu = round(random.uniform(2.0, 15.0), 1)
-                mem = round(max_mem * random.uniform(0.3, 0.6), 1)
+                if name in metrics_dict:
+                    cpu = metrics_dict[name]["cpu"]
+                    mem = metrics_dict[name]["mem"]
+                else:
+                    import random
+                    cpu = round(random.uniform(2.0, 15.0), 1)
+                    mem = round(max_mem * random.uniform(0.3, 0.6), 1)
             else:
                 health = "Unhealthy" if status in ["ImagePullBackOff", "Error", "CrashLoopBackOff"] else "Degraded"
                 
@@ -1342,10 +1943,10 @@ def uuid_uuid4():
 # ─────────────────────────────────────────────
 #  Sidebar Controls
 # ─────────────────────────────────────────────
-st.sidebar.markdown("<div style='text-align:center;'><h2 style='border-left:none; padding-left:0; font-size:1.8rem; color:#ff5722;'>AutoHub SRE Console</h2></div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div style='text-align:center;'><h2 style='border-left:none; padding-left:0; font-size:1.8rem; color:#ff5722;'><i class='fa-solid fa-shield-halved'></i> AutoHub SRE</h2></div>", unsafe_allow_html=True)
 
 # Azure Configurations
-st.sidebar.subheader("🔌 Azure RAG Status")
+st.sidebar.markdown("### <i class='fa-brands fa-microsoft' style='color:#00a4ef;'></i> Azure RAG Status", unsafe_allow_html=True)
 gateway_url = st.sidebar.text_input("API Gateway URL", "http://localhost:5000")
 github_token_input = st.sidebar.text_input("GitHub Token (Optional)", value=os.getenv("GITHUB_TOKEN", ""), type="password", help="Enter a GitHub PAT to avoid API rate limiting")
 if github_token_input:
@@ -1359,12 +1960,12 @@ else:
     st.sidebar.warning("Running in LOCAL MOCK Mode (No Azure keys)")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("⏱️ Real-Time Auto-Refresh")
+st.sidebar.markdown("### <i class='fa-solid fa-arrows-rotate' style='color:#10b981;'></i> Auto-Refresh", unsafe_allow_html=True)
 auto_refresh = st.sidebar.checkbox("Enable Auto-Refresh", value=True, help="Automatically refresh data in real-time")
 refresh_interval = st.sidebar.slider("Refresh Interval (s)", min_value=2, max_value=30, value=5, help="Select polling interval")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("⚙️ Hybrid Simulator Settings")
+st.sidebar.markdown("### <i class='fa-solid fa-gears' style='color:#fbbf24;'></i> Simulator Settings", unsafe_allow_html=True)
 mock_batch_interval = st.sidebar.slider(
     "Warning Batch Interval (s)",
     min_value=5,
@@ -1375,20 +1976,20 @@ mock_batch_interval = st.sidebar.slider(
 MOCK_BATCH_INTERVAL = mock_batch_interval
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("🚨 Inject Failure Anomalies")
+st.sidebar.markdown("### <i class='fa-solid fa-triangle-exclamation' style='color:#ef4444;'></i> Inject Anomalies", unsafe_allow_html=True)
 st.sidebar.info("Simulate typical microservice breakdowns and test the RAG SRE responder.")
 
 active_anomaly = st.sidebar.radio(
     "Select Anomaly Scenario",
-    ["Normal / Healthy Operations", "Database Connection Timeout (Inventory Service)", "Valuation Gateway Timeout (Network Failure)", "Brute-Force Login Security Alert"]
+    ["🟢 Normal / Healthy Operations", "🔴 Database Connection Timeout (Inventory Service)", "🟡 Valuation Gateway Timeout (Network Failure)", "🔒 Brute-Force Login Security Alert"]
 )
 
 # Trigger anomaly HTTP injection
 anomaly_mapping = {
-    "Normal / Healthy Operations": "healthy",
-    "Database Connection Timeout (Inventory Service)": "db_locked",
-    "Valuation Gateway Timeout (Network Failure)": "timeout",
-    "Brute-Force Login Security Alert": "brute_force"
+    "🟢 Normal / Healthy Operations": "healthy",
+    "🔴 Database Connection Timeout (Inventory Service)": "db_locked",
+    "🟡 Valuation Gateway Timeout (Network Failure)": "timeout",
+    "🔒 Brute-Force Login Security Alert": "brute_force"
 }
 
 def inject_anomaly_into_services(scenario):
@@ -1451,13 +2052,13 @@ if st.sidebar.button("Reset In-Memory Databases & Logs"):
 # ─────────────────────────────────────────────
 #  Main Board Layout
 # ─────────────────────────────────────────────
-st.title("🛡️ AI-Powered DevOps Log Analyzer & Incident Responder")
+st.markdown("<h1><i class='fa-solid fa-shield-halved' style='color:#ff5722; margin-right:12px;'></i> AI-Powered DevOps SRE Console</h1>", unsafe_allow_html=True)
 # Setup the 4 main tabs
 tab_console, tab_k8s, tab_suggestions, tab_chat = st.tabs([
-    "📊 Operational Console", 
-    "☸️ Kubernetes Cluster Watch", 
-    "💡 DevOps Suggestion Hub", 
-    "💬 AI SRE Chat Assistant"
+    "Operational Console", 
+    "Kubernetes Cluster Watch", 
+    "DevOps Suggestion Hub", 
+    "AI SRE Chat Assistant"
 ])
 
 @st.fragment(run_every=refresh_interval if auto_refresh else None)
@@ -1491,7 +2092,7 @@ def show_console_tab():
     # ─────────────────────────────────────────────
     #  CI/CD Pipeline Monitor Widget
     # ─────────────────────────────────────────────
-    st.markdown("### 🔄 CI/CD DevSecOps Pipeline Monitor")
+    st.markdown("### <i class='fa-solid fa-arrows-spin' style='color:#6366f1; margin-right:8px;'></i> CI/CD DevSecOps Pipeline Monitor", unsafe_allow_html=True)
     
     with st.spinner("Fetching latest pipeline status from GitHub..."):
         current_anomaly_state = anomaly_mapping[active_anomaly]
@@ -1580,19 +2181,19 @@ def show_console_tab():
             
             failed_list_html = "".join(failed_jobs_details)
             diagnostic_html = f"""<div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
-<h4 style="margin: 0 0 10px 0; color: #ef4444; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🚨 Pipeline Outage Diagnostics</h4>
+<h4 style="margin: 0 0 10px 0; color: #ef4444; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;"><i class='fa-solid fa-circle-xmark'></i> Pipeline Outage Diagnostics</h4>
 <div style="max-height: 250px; overflow-y: auto;">
 {failed_list_html}
 </div>
 </div>"""
         elif status == "in_progress":
             diagnostic_html = f"""<div style="background: rgba(255, 179, 0, 0.05); border: 1px solid rgba(255, 179, 0, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
-<h4 style="margin: 0 0 10px 0; color: #ffb300; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🟡 Active Build running</h4>
+<h4 style="margin: 0 0 10px 0; color: #ffb300; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;"><i class='fa-solid fa-arrows-spin fa-spin'></i> Active Build running</h4>
 <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">GitHub Actions is actively compiling code and executing security gates. Use the Refresh button above to poll live status.</p>
 </div>"""
         else:
             diagnostic_html = f"""<div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 1.25rem; height: 100%;">
-<h4 style="margin: 0 0 10px 0; color: #10b981; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;">🟢 Pipeline Healthy</h4>
+<h4 style="margin: 0 0 10px 0; color: #10b981; font-size: 1rem; text-transform: uppercase; font-family: 'Barlow Condensed', sans-serif;"><i class='fa-solid fa-circle-check'></i> Pipeline Healthy</h4>
 <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">All DevSecOps verification checks and Kubeconform linter tests have passed successfully. System integrity is verified.</p>
 </div>"""
     
@@ -1615,7 +2216,7 @@ def show_console_tab():
     # ─────────────────────────────────────────────
     #  Proactive Incident Alerts
     # ─────────────────────────────────────────────
-    st.markdown("### 🚨 Proactive AIOps Incident Alerts")
+    st.markdown("### <i class='fa-solid fa-bell-exclamation' style='color:#ef4444; margin-right:8px;'></i> Proactive AIOps Incident Alerts", unsafe_allow_html=True)
     
     incidents = []
     if azure_configured and TABLES_AVAILABLE:
@@ -1673,7 +2274,7 @@ def show_console_tab():
     # ─────────────────────────────────────────────
     #  Ingested Live Log Stream
     # ─────────────────────────────────────────────
-    st.markdown("### 📊 Ingested Live Log Stream")
+    st.markdown("### <i class='fa-solid fa-list-ul' style='color:#10b981; margin-right:8px;'></i> Ingested Live Log Stream", unsafe_allow_html=True)
     all_logs = load_local_logs()
     log_html = ""
     if all_logs:
@@ -1697,7 +2298,7 @@ with tab_console:
 
 @st.fragment(run_every=refresh_interval if auto_refresh else None)
 def show_k8s_tab():
-    st.markdown("### ☸️ Kubernetes Pod Cluster Watch")
+    st.markdown("### <i class='fa-brands fa-kubernetes' style='color:#326ce5; margin-right:8px;'></i> Kubernetes Pod Cluster Watch", unsafe_allow_html=True)
     st.markdown("Monitor real-time pod replicas status, network configurations, and resource consumptions across the fleet.")
     
     real_pods = get_real_k8s_pods()
@@ -1705,10 +2306,24 @@ def show_k8s_tab():
     
     if is_real_cluster:
         pods_list = real_pods
-        st.info("ℹ️ Connected to AKS: Showing **live pod status** in namespace `log-analysis`.")
+        st.markdown(clean_html("""
+        <div class="custom-alert success">
+            <span class="alert-icon"><i class="fa-solid fa-bolt-lightning"></i></span>
+            <div class="alert-content">
+                <strong>AKS Live Link Active:</strong> Showing real-time pod telemetry in namespace <code>log-analysis</code>.
+            </div>
+        </div>
+        """), unsafe_allow_html=True)
     else:
         pods_list = get_mock_k8s_pods(anomaly_mapping[active_anomaly])
-        st.warning("⚠️ Could not connect to live AKS cluster. Showing **simulated pod states**.")
+        st.markdown(clean_html("""
+        <div class="custom-alert warning">
+            <span class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <div class="alert-content">
+                <strong>Simulated Telemetry Mode:</strong> Could not connect to live AKS cluster. Displaying high-fidelity local pod mocks.
+            </div>
+        </div>
+        """), unsafe_allow_html=True)
     
     # Calculate global metrics
     total_pods = len(pods_list)
@@ -1723,98 +2338,287 @@ def show_k8s_tab():
     # Render Pod KPIs
     k8s_col1, k8s_col2, k8s_col3, k8s_col4 = st.columns(4)
     with k8s_col1:
-        st.markdown(f'<div class="metric-card"><div class="stat-label">Total Replicas</div><div class="stat-val" style="color:#3b82f6;">{total_pods} Pods</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card blue"><div class="stat-label"><i class="fa-solid fa-cubes"></i> Total Replicas</div><div class="stat-val">{total_pods} <span style="font-size:0.9rem; font-weight:normal; color:#94a3b8;">Pods</span></div></div>', unsafe_allow_html=True)
     with k8s_col2:
-        status_color = "#10b981" if failed_pods == 0 and degraded_pods == 0 else ("#ffb300" if failed_pods == 0 else "#ef4444")
-        st.markdown(f'<div class="metric-card"><div class="stat-label">Pod Health States</div><div class="stat-val" style="color:{status_color};">{running_pods} OK / {degraded_pods} WRN / {failed_pods} ERR</div></div>', unsafe_allow_html=True)
+        status_class = "green" if failed_pods == 0 and degraded_pods == 0 else ("amber" if failed_pods == 0 else "orange")
+        st.markdown(f'<div class="metric-card {status_class}"><div class="stat-label"><i class="fa-solid fa-heart-pulse"></i> Pod Health States</div><div class="stat-val">{running_pods} <span style="font-size:0.8rem; font-weight:normal; color:#10b981;">OK</span> / {degraded_pods} <span style="font-size:0.8rem; font-weight:normal; color:#fbbf24;">WRN</span> / {failed_pods} <span style="font-size:0.8rem; font-weight:normal; color:#ef4444;">ERR</span></div></div>', unsafe_allow_html=True)
     with k8s_col3:
-        st.markdown(f'<div class="metric-card"><div class="stat-label">Mean Pod CPU Util</div><div class="stat-val" style="color:#ff5722;">{avg_cpu:.1f}%</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card orange"><div class="stat-label">Mean Pod CPU Util</div><div class="stat-val">{avg_cpu:.1f}%</div></div>', unsafe_allow_html=True)
     with k8s_col4:
-        st.markdown(f'<div class="metric-card"><div class="stat-label">Aggregated Memory</div><div class="stat-val" style="color:#3b82f6;">{int(total_mem)}MB / {max_mem_limit}MB</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card blue"><div class="stat-label">Aggregated Memory</div><div class="stat-val">{int(total_mem)}<span style="font-size:0.9rem; font-weight:normal; color:#94a3b8;">MB</span> <span style="font-size:0.8rem; font-weight:normal; color:#64748b;">/ {max_mem_limit}MB</span></div></div>', unsafe_allow_html=True)
         
-    st.markdown("#### 📦 Pod Replica Instances")
-    
-    # Generate HTML grid
-    pod_cards_html = ""
-    for pod in pods_list:
-        health_class = "dot-green" if pod["health"] == "Healthy" else ("dot-yellow" if pod["health"] == "Degraded" else "dot-red")
-        cpu_color = "#10b981" if pod["cpu"] < 60 else ("#ffb300" if pod["cpu"] < 85 else "#ef4444")
-        mem_pct = (pod["mem"] / pod["max_mem"]) * 100 if pod["max_mem"] > 0 else 0
-        mem_color = "#10b981" if mem_pct < 60 else ("#ffb300" if mem_pct < 85 else "#ef4444")
+    # Memory and CPU Utilization Comparison Charts
+    with st.expander("📊 Cluster-Wide Resource Utilization Overview", expanded=False):
+        chart_col1, chart_col2 = st.columns(2)
         
-        card_html = f"""<div class="k8s-pod-card">
-<div class="k8s-pod-header">
-<span class="k8s-pod-name" title="{pod['name']}">{pod['name']}</span>
-<span class="{health_class}" title="Health: {pod['health']}"></span>
-</div>
-<div class="k8s-pod-detail"><span>Status:</span> <span class="k8s-pod-metric">{pod['status']}</span></div>
-<div class="k8s-pod-detail"><span>Probes:</span> <span class="k8s-pod-metric">{pod['probe']}</span></div>
-<div class="k8s-pod-detail"><span>Restarts:</span> <span class="k8s-pod-metric">{pod['restarts']}</span></div>
-<div class="k8s-pod-detail"><span>Age:</span> <span class="k8s-pod-metric">{pod['age']}</span></div>
-<div class="k8s-pod-detail"><span>CPU:</span> <span style="color:{cpu_color}; font-weight:bold;">{pod['cpu']}%</span></div>
-<div class="k8s-pod-detail"><span>Mem:</span> <span style="color:{mem_color}; font-weight:bold;">{int(pod['mem'])}MB / {pod['max_mem']}MB</span></div>
-<div style="font-size:0.7rem; color:#64748b; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.5rem; border-top:1px solid rgba(255,255,255,0.03); padding-top:0.25rem;" title="{pod['message']}">{pod['message']}</div>
-</div>"""
-        pod_cards_html += card_html
+        # Prepare DataFrame
+        df_pods = pd.DataFrame([
+            {
+                "Pod Name": p["name"],
+                "Service": p["service"],
+                "CPU Utilization (%)": p["cpu"],
+                "Memory Usage (MB)": p["mem"],
+                "Memory Limit (MB)": p["max_mem"],
+                "Memory Utilization (%)": round((p["mem"] / p["max_mem"]) * 100, 1) if p["max_mem"] > 0 else 0
+            }
+            for p in pods_list
+        ])
         
-    st.markdown(f'<div class="k8s-pod-grid">{pod_cards_html}</div>', unsafe_allow_html=True)
-    
-    inspect_col1, inspect_col2 = st.columns([5, 5])
-    
-    with inspect_col1:
-        st.markdown("#### 📋 Container stdout Log Viewer")
-        selected_pod = st.selectbox("Select Pod to Inspect", [p["name"] for p in pods_list], key="k8s_pod_select")
-        if selected_pod:
-            if is_real_cluster:
-                pod_logs = get_real_pod_logs(selected_pod)
-            else:
-                pod_logs = get_mock_pod_logs(selected_pod, anomaly_mapping[active_anomaly])
-            st.markdown(f'<div class="k8s-log-terminal">{pod_logs.replace(chr(10), "<br>")}</div>', unsafe_allow_html=True)
-            
-    with inspect_col2:
-        st.markdown("#### 📈 Resource Utilization History")
-        if selected_pod:
-            selected_pod_obj = next(p for p in pods_list if p["name"] == selected_pod)
-            base_cpu = selected_pod_obj["cpu"]
-            base_mem = selected_pod_obj["mem"]
-            
-            import random
-            random.seed(hash(selected_pod))
-            cpu_history = [max(0.1, min(100.0, base_cpu + random.uniform(-4, 4))) for _ in range(14)] + [base_cpu]
-            mem_history = [max(10.0, min(float(selected_pod_obj["max_mem"]), base_mem + random.uniform(-8, 8))) for _ in range(14)] + [base_mem]
-            history_times = [(datetime.now() - timedelta(minutes=i)).strftime("%H:%M") for i in reversed(range(15))]
-            
-            df_history = pd.DataFrame({
-                "Time": history_times * 2,
-                "Metric Value": cpu_history + mem_history,
-                "Resource Type": ["CPU Utilization (%)"] * 15 + ["Memory Usage (MB)"] * 15
-            })
-            
-            fig = px.line(
-                df_history, 
-                x="Time", 
-                y="Metric Value", 
-                color="Resource Type",
-                title=f"Telemetry History: {selected_pod}",
+        with chart_col1:
+            # Use Service name (shorter) to avoid x-axis overlap
+            fig_mem_bar = px.bar(
+                df_pods,
+                x="Service",
+                y="Memory Utilization (%)",
+                color="Memory Utilization (%)",
+                color_continuous_scale="Viridis",
+                title="Pod Memory Utilization (%) by Service",
                 template="plotly_dark",
-                color_discrete_map={"CPU Utilization (%)": "#ff5722", "Memory Usage (MB)": "#3b82f6"}
+                hover_data={"Pod Name": True, "Memory Usage (MB)": True, "Memory Limit (MB)": True}
             )
-            fig.update_layout(
+            fig_mem_bar.update_layout(
                 plot_bgcolor="rgba(0,0,0,0)",
                 paper_bgcolor="rgba(0,0,0,0)",
-                xaxis_gridcolor="rgba(255,255,255,0.05)",
-                yaxis_gridcolor="rgba(255,255,255,0.05)",
-                margin=dict(l=20, r=20, t=40, b=20),
-                height=250
+                margin=dict(l=10, r=10, t=45, b=120),
+                height=380,
+                xaxis=dict(
+                    tickangle=-40,
+                    tickfont=dict(size=11),
+                    title=""
+                ),
+                yaxis=dict(title="Memory Util (%)"),
+                coloraxis_colorbar=dict(thickness=12, len=0.7)
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig_mem_bar, use_container_width=True)
+            
+        with chart_col2:
+            fig_cpu_bar = px.bar(
+                df_pods,
+                x="Service",
+                y="CPU Utilization (%)",
+                color="CPU Utilization (%)",
+                color_continuous_scale="Oranges",
+                title="Pod CPU Utilization (%) by Service",
+                template="plotly_dark",
+                hover_data={"Pod Name": True, "CPU Utilization (%)": True}
+            )
+            fig_cpu_bar.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=10, r=10, t=45, b=120),
+                height=380,
+                xaxis=dict(
+                    tickangle=-40,
+                    tickfont=dict(size=11),
+                    title=""
+                ),
+                yaxis=dict(title="CPU Util (%)"),
+                coloraxis_colorbar=dict(thickness=12, len=0.7)
+            )
+            st.plotly_chart(fig_cpu_bar, use_container_width=True)
+
+    st.markdown("---")
+    
+    # 🎯 Pod Selection at top level
+    selected_pod = st.selectbox("🎯 Select Pod to Inspect & Analyze Telemetry", [p["name"] for p in pods_list], key="k8s_pod_select")
+    selected_pod_obj = next(p for p in pods_list if p["name"] == selected_pod)
+    
+    # Generate HTML grid for Directory Table
+    pod_rows_html = ""
+    for p in pods_list:
+        mem_pct = (p["mem"] / p["max_mem"]) * 100 if p["max_mem"] > 0 else 0
+        mem_color = "#10b981" if mem_pct < 60 else ("#ffb300" if mem_pct < 85 else "#ef4444")
+        cpu_color = "#10b981" if p["cpu"] < 60 else ("#ffb300" if p["cpu"] < 85 else "#ef4444")
+        
+        status_badge_class = "running"
+        if p["status"] != "Running":
+            status_badge_class = p["status"].lower()
+        elif p["health"] == "Degraded":
+            status_badge_class = "degraded"
+        elif p["health"] == "Unhealthy":
+            status_badge_class = "failed"
+            
+        status_label = p["status"]
+        if p["health"] == "Degraded" and p["status"] == "Running":
+            status_label = "Degraded"
+            
+        status_html = f'<span class="k8s-badge {status_badge_class}">{status_label}</span>'
+        
+        # Highlight selected pod row with subtle background
+        row_style = "background: rgba(99, 102, 241, 0.08); border-left: 3px solid #6366f1;" if p["name"] == selected_pod else ""
+        
+        row = f"""<tr style="{row_style}">
+        <td style="text-align: center; padding: 0.6rem 0.5rem;">{status_html}</td>
+        <td class="pod-table-name" style="font-family: 'Fira Code', monospace; font-size: 0.78rem; font-weight: 600;" title="{p['name']}">{p['name']}</td>
+        <td style="text-align: center;"><span class="pod-table-badge" style="background: rgba(255,255,255,0.06); color:#cbd5e1; font-weight:700; font-family: 'Fira Code', monospace;">{p['restarts']}</span></td>
+        <td><span style="color:{cpu_color}; font-weight:700; font-family: 'Fira Code', monospace;">{p['cpu']}%</span></td>
+        <td>
+            <div class="progress-bar-container" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.03); border-radius: 4px; height: 8px;">
+                <div class="progress-bar-fill" style="background-color:{mem_color}; width:{min(100.0, mem_pct)}%; height: 100%;"></div>
+            </div>
+            <span style="color:{mem_color}; font-weight:700; font-size:0.75rem; font-family: 'Fira Code', monospace;">{int(p['mem'])}MB</span>
+        </td>
+        </tr>"""
+        pod_rows_html += row
+
+    pod_table_html = f"""<div class="pod-table-container">
+    <table class="pod-table">
+    <thead>
+    <tr>
+        <th style="text-align: center; width: 85px;">State</th>
+        <th>Pod Name</th>
+        <th style="text-align: center; width: 70px;">Restarts</th>
+        <th style="width: 75px;">CPU</th>
+        <th>Memory</th>
+    </tr>
+    </thead>
+    <tbody>
+    {pod_rows_html}
+    </tbody>
+    </table>
+    </div>"""
+
+    # Split panel columns
+    k8s_col_left, k8s_col_right = st.columns([5, 5])
+    
+    with k8s_col_left:
+        st.markdown("#### <i class='fa-solid fa-table-list' style='color:#3b82f6; margin-right:8px;'></i> Pod Status Directory", unsafe_allow_html=True)
+        st.markdown(clean_html(pod_table_html), unsafe_allow_html=True)
+        
+        # Resource Utilization History
+        st.markdown("#### <i class='fa-solid fa-chart-line' style='color:#ff5722; margin-right:8px;'></i> Resource Utilization History", unsafe_allow_html=True)
+        base_cpu = selected_pod_obj["cpu"]
+        base_mem = selected_pod_obj["mem"]
+        
+        import random
+        random.seed(hash(selected_pod))
+        cpu_history = [max(0.1, min(100.0, base_cpu + random.uniform(-4, 4))) for _ in range(14)] + [base_cpu]
+        mem_history = [max(10.0, min(float(selected_pod_obj["max_mem"]), base_mem + random.uniform(-8, 8))) for _ in range(14)] + [base_mem]
+        history_times = [(datetime.now() - timedelta(minutes=i)).strftime("%H:%M") for i in reversed(range(15))]
+        
+        df_history = pd.DataFrame({
+            "Time": history_times * 2,
+            "Metric Value": cpu_history + mem_history,
+            "Resource Type": ["CPU Utilization (%)"] * 15 + ["Memory Usage (MB)"] * 15
+        })
+        
+        fig = px.line(
+            df_history, 
+            x="Time", 
+            y="Metric Value", 
+            color="Resource Type",
+            title=f"Telemetry History: {selected_pod}",
+            template="plotly_dark",
+            color_discrete_map={"CPU Utilization (%)": "#ff5722", "Memory Usage (MB)": "#3b82f6"}
+        )
+        fig.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis_gridcolor="rgba(255,255,255,0.04)",
+            yaxis_gridcolor="rgba(255,255,255,0.04)",
+            margin=dict(l=20, r=20, t=40, b=20),
+            height=255,
+            hovermode="x unified"
+        )
+        fig.update_traces(line=dict(width=3.5, shape="spline"))
+        fig.update_layout(
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+    with k8s_col_right:
+        st.markdown("#### <i class='fa-solid fa-magnifying-glass' style='color:#6366f1; margin-right:8px;'></i> Selected Pod Inspector", unsafe_allow_html=True)
+        
+        meta_status_color = "#10b981"
+        meta_status_pulse = ""
+        if selected_pod_obj["health"] == "Degraded":
+            meta_status_color = "#fbbf24"
+            meta_status_pulse = "animation: pulse 1.8s infinite;"
+        elif selected_pod_obj["health"] == "Unhealthy" or selected_pod_obj["status"] in ["Failed", "Error", "CrashLoopBackOff"]:
+            meta_status_color = "#ef4444"
+            
+        metadata_html = f"""
+        <div style="background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 0.5rem;">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #94a3b8; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem;">
+                    <span><i class="fa-solid fa-circle-nodes"></i></span> Pod Health Metadata
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: {meta_status_color}; box-shadow: 0 0 8px {meta_status_color}; {meta_status_pulse}"></span>
+                    <span style="font-size: 0.75rem; font-weight: 700; color: {meta_status_color}; text-transform: uppercase; letter-spacing: 0.05em;">{selected_pod_obj['health']}</span>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                <div style="background: rgba(2, 6, 23, 0.35); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04); text-align: center;">
+                    <div style="font-size: 0.62rem; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Status</div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #ffffff; font-family: monospace;">{selected_pod_obj['status']}</div>
+                </div>
+                <div style="background: rgba(2, 6, 23, 0.35); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04); text-align: center;">
+                    <div style="font-size: 0.62rem; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Age</div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #ffffff; font-family: monospace;">{selected_pod_obj['age']}</div>
+                </div>
+                <div style="background: rgba(2, 6, 23, 0.35); padding: 0.6rem; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.04); text-align: center;">
+                    <div style="font-size: 0.62rem; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.2rem;">Host Node</div>
+                    <div style="font-size: 0.85rem; font-weight: 800; color: #e2e8f0; font-family: monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{selected_pod_obj['node']}">{selected_pod_obj['node'].split('-')[-1]}</div>
+                </div>
+            </div>
+            <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.6rem; display: flex; align-items: flex-start; gap: 0.5rem; line-height: 1.4;">
+                <span style="color:#64748b; font-weight: 700; text-transform: uppercase; font-size: 0.65rem;">Message:</span>
+                <span style="font-family: monospace; color:#94a3b8;">{selected_pod_obj['message']}</span>
+            </div>
+        </div>
+        """
+        st.markdown(clean_html(metadata_html), unsafe_allow_html=True)
+        
+        # stdout Logs Terminal
+        st.markdown("#### <i class='fa-solid fa-terminal' style='color:#10b981; margin-right:8px;'></i> Container stdout Log Viewer", unsafe_allow_html=True)
+        if is_real_cluster:
+            pod_logs = get_real_pod_logs(selected_pod)
+        else:
+            pod_logs = get_mock_pod_logs(selected_pod, anomaly_mapping[active_anomaly])
+            
+        colored_pod_logs = colorize_logs(pod_logs)
+        
+        terminal_html = f"""
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="t-btn red"></span>
+                    <span class="t-btn yellow"></span>
+                    <span class="t-btn green"></span>
+                </div>
+                <span class="terminal-title">bash &mdash; stdout &mdash; {selected_pod}</span>
+                <span class="terminal-status">LIVE STREAM</span>
+            </div>
+            <div class="terminal-body" style="height: 180px;">
+                {colored_pod_logs}
+            </div>
+        </div>
+        """
+        st.markdown(clean_html(terminal_html), unsafe_allow_html=True)
+        
+        # Telemetry Data Table inside expander
+        st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
+        with st.expander("📊 View Resource Telemetry History Logs Table", expanded=False):
+            df_tabular = pd.DataFrame({
+                "Timestamp (Relative)": history_times,
+                "CPU Utilization": [f"{v:.1f}%" for v in cpu_history],
+                "Memory Usage": [f"{int(v)} MB / {selected_pod_obj['max_mem']} MB" for v in mem_history]
+            })
+            st.dataframe(df_tabular.iloc[::-1], use_container_width=True, hide_index=True)
 
 with tab_k8s:
     show_k8s_tab()
 
 
 with tab_suggestions:
-    st.markdown("### 💡 Multi-Stage DevOps Suggestion Hub")
+    st.markdown("### <i class='fa-solid fa-lightbulb' style='color:#fbbf24; margin-right:8px;'></i> Multi-Stage DevOps Suggestion Hub", unsafe_allow_html=True)
     st.markdown("Diagnose problems and view pre-mapped resolutions for typical errors encountered across the software lifecycle.")
     
     stage_tab1, stage_tab2, stage_tab3 = st.tabs(["🛠️ Development Stage", "🚀 Deployment Stage", "📈 Post-Deployment (Runtime)"])
@@ -1856,7 +2660,7 @@ with tab_suggestions:
             st.markdown(classify_devops_error("brute-force login attempts auth-service")["remedy"])
             
     st.markdown("---")
-    st.markdown("### 🧠 AI DevOps Proactive Advisor")
+    st.markdown("### <i class='fa-solid fa-brain' style='color:#a855f7; margin-right:8px;'></i> AI DevOps Proactive Advisor", unsafe_allow_html=True)
     st.markdown("Paste any terminal dump, exception stack, or pipeline trace below to extract a direct classification, cause explanation, and repair code.")
     
     user_error_input = st.text_area("Paste error log dump here...", height=120, key="advisor_log_input")
@@ -1883,43 +2687,140 @@ with tab_suggestions:
 
 
 with tab_chat:
-    st.markdown("### 💬 SRE Incident AI Scent-Responder")
-    st.markdown("Ask the operational RAG about errors, system health, and outages.")
-    
+    # 1. Chat Header and Status Badge
+    header_col1, header_col2 = st.columns([7, 3])
+    with header_col1:
+        st.markdown("<h3 style='margin-bottom:0.25rem; border:none; text-shadow:none; text-transform:none; padding-bottom:0;'><i class='fa-solid fa-comments' style='color:#10b981; margin-right:8px;'></i> AI SRE Incident Assistant</h3>", unsafe_allow_html=True)
+        if azure_configured:
+            st.markdown('<span style="background-color: rgba(16, 185, 129, 0.12); color: #10b981; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: bold; border: 1px solid rgba(16, 185, 129, 0.25); display: inline-block; margin-bottom:1rem;">● RAG Connected (Azure OpenAI)</span>', unsafe_allow_html=True)
+        else:
+            st.markdown('<span style="background-color: rgba(251, 191, 36, 0.12); color: #fbbf24; padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: bold; border: 1px solid rgba(251, 191, 36, 0.25); display: inline-block; margin-bottom:1rem;">● Fallback Mode (Local DevOps Rulebase)</span>', unsafe_allow_html=True)
+    with header_col2:
+        st.markdown("<div style='text-align: right; padding-top: 15px;'>", unsafe_allow_html=True)
+        if st.button("🗑️ Clear Chat History", key="clear_chat_history_btn", use_container_width=True):
+            st.session_state.messages = []
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        
+
+    # 2. Render messages history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-            if "citations" in message and message["citations"]:
-                with st.expander("📚 Cited Source Logs"):
+            if message["role"] == "user":
+                st.markdown(f"""
+                <div class="chat-bubble-user">
+                    <div class="chat-role-header" style="color: #6366f1;"><i class="fa-solid fa-user-gear"></i> SRE Operator</div>
+                    <div style="color: #e2e8f0; font-size: 0.92rem;">{message['content']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="chat-bubble-assistant">
+                    <div class="chat-role-header" style="color: #10b981;"><i class="fa-solid fa-robot"></i> AI SRE Assistant</div>
+                    <div style="color: #e2e8f0; font-size: 0.92rem; line-height: 1.6;">
+                """, unsafe_allow_html=True)
+                st.markdown(message["content"])
+                
+                if "citations" in message and message["citations"]:
+                    cit_rows = ""
                     for cit in message["citations"]:
-                        color = "red" if cit["level"] == "ERROR" else ("orange" if cit["level"] == "WARNING" else "green")
-                        st.markdown(f"**[{cit['timestamp']}]** `:{color}[{cit['level']}]` **{cit['service']}**: {cit['message']}")
-                        
-    st.markdown("**Suggested operational queries:**")
-    q_col1, q_col2, q_col3 = st.columns(3)
+                        level = cit.get("level", "INFO")
+                        lvl_color = "#10b981"
+                        if level in ["ERROR", "CRITICAL"]:
+                            lvl_color = "#ef4444"
+                        elif level == "WARNING":
+                            lvl_color = "#fbbf24"
+                            
+                        cit_rows += f"""
+                        <div class="chat-citation-row">
+                            <span class="chat-citation-time">[{cit.get('timestamp')}]</span>
+                            <span class="chat-citation-level" style="background:{lvl_color}18; color:{lvl_color}; border:1px solid {lvl_color}30;">{level}</span>
+                            <span class="chat-citation-service">{cit.get('service')}</span>:
+                            <span class="chat-citation-msg">{cit.get('message')}</span>
+                        </div>
+                        """
+                    st.markdown(f"""
+                    <div class="chat-citation-header">
+                        <div class="chat-citation-title"><i class="fa-solid fa-database"></i> Cited Source Telemetry</div>
+                        <div class="chat-citation-console">
+                            {cit_rows}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                st.markdown("</div></div>", unsafe_allow_html=True)
+
+    # 3. Render Empty state landing page if there are no messages
     quick_query = None
-    with q_col1:
-        if st.button("Why is /api/inventory returning 503 errors?", key="q1_btn"):
-            quick_query = "Why is /api/inventory returning 503 errors?"
-    with q_col2:
-        if st.button("Explain what caused the valuation timeout.", key="q2_btn"):
-            quick_query = "Explain what caused the valuation timeout."
-    with q_col3:
-        if st.button("Show all security warnings or failed logins.", key="q3_btn"):
-            quick_query = "Show all security warnings or failed logins."
-            
-    if user_input := st.chat_input("Query incident logs...") or quick_query:
-        query_to_run = user_input or quick_query
+    if not st.session_state.messages:
+        st.markdown(f"""
+        <div class="chat-welcome-container">
+            <div style="font-size: 3rem; color: #6366f1; margin-bottom: 1rem;"><i class="fa-solid fa-user-astronaut"></i></div>
+            <div class="chat-welcome-title">AI SRE Incident Co-Pilot</div>
+            <div class="chat-welcome-subtitle">Ask the operational RAG about active alerts, deployment failures, or cluster status.</div>
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; font-weight: 700; margin-bottom: 1rem;">Suggested Queries</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        card_cols = st.columns(3)
+        suggestions = [
+            {
+                "title": "<i class='fa-solid fa-triangle-exclamation' style='color:#ef4444;'></i> Outage Diagnostic",
+                "text": "Why is /api/inventory returning 503 errors?",
+                "desc": "Analyze connection pool exhaustion and database timeouts in inventory-service.",
+                "action": "Diagnose Outage ↗",
+                "key": "card_q1"
+            },
+            {
+                "title": "<i class='fa-solid fa-gauge-high' style='color:#fbbf24;'></i> Performance Audit",
+                "text": "Explain what caused the valuation timeout.",
+                "desc": "Investigate HTTP connection read timeouts and downstream dependency delays.",
+                "action": "Analyze Latency ↗",
+                "key": "card_q2"
+            },
+            {
+                "title": "<i class='fa-solid fa-shield-lock' style='color:#3b82f6;'></i> Security Investigation",
+                "text": "Show all security warnings or failed logins.",
+                "desc": "Audit brute-force authentication attempts and admin account lock throttles.",
+                "action": "Audit Security ↗",
+                "key": "card_q3"
+            }
+        ]
+        
+        for idx, sug in enumerate(suggestions):
+            with card_cols[idx]:
+                st.markdown(f"""
+                <div class="chat-suggestion-card">
+                    <div class="chat-suggestion-title">{sug['title']}</div>
+                    <div class="chat-suggestion-desc" style="margin-bottom: 1rem; height: 50px; overflow: hidden;">{sug['desc']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button(sug["action"], key=sug["key"], use_container_width=True):
+                    quick_query = sug["text"]
+
+    # 4. Handle input
+    user_input = st.chat_input("Query incident logs...")
+    if user_input or quick_query:
+        query_to_run = user_input if user_input else quick_query
         
         st.session_state.messages.append({"role": "user", "content": query_to_run})
         
         with st.chat_message("user"):
-            st.markdown(query_to_run)
+            st.markdown(f"""
+            <div class="chat-bubble-user">
+                <div class="chat-role-header" style="color: #6366f1;"><i class="fa-solid fa-user-gear"></i> SRE Operator</div>
+                <div style="color: #e2e8f0; font-size: 0.92rem;">{query_to_run}</div>
+            </div>
+            """, unsafe_allow_html=True)
             
         with st.chat_message("assistant"):
+            st.markdown(f"""
+            <div class="chat-bubble-assistant">
+                <div class="chat-role-header" style="color: #10b981;"><i class="fa-solid fa-robot"></i> AI SRE Assistant</div>
+                <div style="color: #e2e8f0; font-size: 0.92rem; line-height: 1.6;">
+            """, unsafe_allow_html=True)
+            
             with st.spinner("Analyzing operational telemetry indices..."):
                 answer = ""
                 citations = []
@@ -2047,16 +2948,54 @@ Please verify that:
                         answer = result.get("answer")
                         citations = result.get("citations", [])
                     except Exception as rag_err:
-                        answer = f"Azure RAG Execution failed: {str(rag_err)}. Falling back to local responder."
+                        err_msg = f"⚠️ **Azure RAG Execution failed**: {str(rag_err)}"
+                        diag_res = classify_devops_error(query_to_run)
+                        if diag_res["type"] != "General DevOps / Operational Issue":
+                            answer = f"""{err_msg}
+
+### 🔍 Local DevOps Diagnostics (Fallback)
+
+We analyzed the signature of your query and matched it to a **{diag_res['type']}** during the **{diag_res['stage']}**.
+
+#### 📁 Root Cause Analysis
+* **Identified Cause**: {diag_res['cause']}
+
+#### 🛠️ Recommended Action Plan
+{diag_res['remedy']}
+"""
+                        else:
+                            answer = f"""{err_msg}
+
+### AutoHub Operations Summary (Fallback)
+
+All systems are reporting healthy. If you are currently troubleshooting an incident, please select an anomaly scenario in the left sidebar to generate error traces.
+"""
+                        citations = []
                         azure_configured = False
                         
-                if not is_pipeline_query and not is_k8s_query and not azure_configured:
+                if not is_pipeline_query and not is_k8s_query and not azure_configured and not answer:
                     time.sleep(1.2)
                     relevant_logs = load_local_logs()
+                    local_incidents = load_local_incidents()
                     
-                    if "503" in query_to_run.lower() or "inventory" in query_to_run.lower():
+                    # Identify the currently active anomaly state
+                    current_anomaly = anomaly_mapping[active_anomaly]  # 'healthy', 'db_locked', 'timeout', 'brute_force'
+                    
+                    # Check if the user is asking a general question about status/outage/errors
+                    is_general_query = any(kw in query_to_run.lower() for kw in [
+                        "what is", "why is", "outage", "error", "fail", "issue", "problem", "wrong", 
+                        "happen", "status", "health", "analyze", "diagnose", "incident", "out", "down", 
+                        "broken", "crash", "alert"
+                    ])
+                    
+                    # 1. If an active anomaly is simulated and the query matches the service, or is general
+                    if current_anomaly == "db_locked" and (is_general_query or any(kw in query_to_run.lower() for kw in ["db", "database", "503", "inventory", "hikaripool", "connection", "lock"])):
                         citations = [l for l in relevant_logs if l["service"] in ["inventory-service", "gateway"]]
-                        answer = """
+                        db_incident = next((inc for inc in local_incidents if inc["service"] == "inventory-service" or "inventory" in inc["message"].lower()), None)
+                        if db_incident:
+                            answer = db_incident["answer"]
+                        else:
+                            answer = """
 ### Root Cause Analysis: `/api/inventory` returning 503 Service Unavailable
 
 A review of recent logs reveals that the **inventory-service** is failing health checks and returning HTTP 503 errors.
@@ -2073,9 +3012,13 @@ A review of recent logs reveals that the **inventory-service** is failing health
 - **Immediate Action**: Restart the `inventory-service` container/pod to release locked database connections.
 - **Permanent Fix**: Adjust the database connection pool configuration in the service environment variables (e.g. set `MAX_CONNECTIONS=100`) and implement connection pooling cleanups.
 """
-                    elif "valuation" in query_to_run.lower() or "timeout" in query_to_run.lower():
+                    elif current_anomaly == "timeout" and (is_general_query or any(kw in query_to_run.lower() for kw in ["timeout", "502", "504", "valuation", "gateway", "read timed out", "delay", "slow"])):
                         citations = [l for l in relevant_logs if l["service"] in ["valuation-service", "gateway"]]
-                        answer = """
+                        val_incident = next((inc for inc in local_incidents if inc["service"] == "valuation-service" or "valuation" in inc["message"].lower()), None)
+                        if val_incident:
+                            answer = val_incident["answer"]
+                        else:
+                            answer = """
 ### Root Cause Analysis: `/api/valuation` Gateway Timeout (502/504)
 
 We detected a latency spike in `/api/valuation` leading to Gateway Timeout errors.
@@ -2091,16 +3034,20 @@ We detected a latency spike in `/api/valuation` leading to Gateway Timeout error
 - Check the health of downstream service `inventory-service`.
 - Increase the HTTP connection timeout threshold or implement a circuit breaker (e.g. returning cached valuation pricing when the inventory service is unreachable).
 """
-                    elif "security" in query_to_run.lower() or "login" in query_to_run.lower() or "auth" in query_to_run.lower():
+                    elif current_anomaly == "brute_force" and (is_general_query or any(kw in query_to_run.lower() for kw in ["security", "login", "auth", "brute", "failed", "attempt", "unauthorized", "admin", "401", "429"])):
                         citations = [l for l in relevant_logs if l["service"] in ["auth-service", "gateway"]]
-                        answer = """
+                        auth_incident = next((inc for inc in local_incidents if inc["service"] == "auth-service" or "auth" in inc["message"].lower()), None)
+                        if auth_incident:
+                            answer = auth_incident["answer"]
+                        else:
+                            answer = """
 ### Security Investigation: Brute-Force Authentication Attempt Detected
 
 Operational logs contain multiple authentication alerts on `/api/auth/login`.
 
 #### Event Timeline
 - Over a span of 60 seconds, 5 consecutive failed login attempts were recorded for user `admin` resulting in `401 Unauthorized` responses.
-- At `2026-05-24T11:00:00Z`, the **auth-service** triggered a security alert log:
+- The **auth-service** triggered a security alert log:
   ```text
   SECURITY ALERT: Multiple failed login attempts (5+) detected on user 'admin' within 60 seconds. Triggering operational throttle.
   ```
@@ -2111,8 +3058,61 @@ Operational logs contain multiple authentication alerts on `/api/auth/login`.
 - Enable Multi-Factor Authentication (MFA) for administrative fleet logins.
 """
                     else:
-                        citations = relevant_logs[-5:] if relevant_logs else []
-                        answer = """
+                        diag_res = classify_devops_error(query_to_run)
+                        if diag_res["type"] != "General DevOps / Operational Issue":
+                            citations = []
+                            answer = f"""### 🔍 DevOps Diagnostic Advisor (Local Fallback)
+
+We analyzed the signature of your query and matched it to a **{diag_res['type']}** during the **{diag_res['stage']}**.
+
+#### 📁 Root Cause Analysis
+* **Identified Cause**: {diag_res['cause']}
+
+#### 🛠️ Recommended Action Plan
+{diag_res['remedy']}
+"""
+                        else:
+                            if current_anomaly != "healthy":
+                                citations = relevant_logs[-5:] if relevant_logs else []
+                                if current_anomaly == "db_locked":
+                                    answer = f"""### 🛡️ Active Outage Incident Detected
+
+There is an active simulated outage: **Database Connection Timeout on inventory-service**.
+Your query *"{query_to_run}"* does not specifically target this issue, but here is the quick diagnostic summary:
+
+- **Affected Service**: `inventory-service` / `gateway`
+- **Current Status**: Failing health checks with 503 errors.
+- **Root Cause**: Relational database connection pool exhaustion (max limit of 50 connections exceeded).
+
+**Ask me: "Why is /api/inventory returning 503 errors?"** or check the **Operational Console** tab for complete details.
+"""
+                                elif current_anomaly == "timeout":
+                                    answer = f"""### 🛡️ Active Outage Incident Detected
+
+There is an active simulated outage: **Valuation Gateway Timeout (Network Failure)**.
+Your query *"{query_to_run}"* does not specifically target this issue, but here is the quick diagnostic summary:
+
+- **Affected Service**: `valuation-service` / `gateway`
+- **Current Status**: Returning 502/504 errors on readiness probe failure.
+- **Root Cause**: Downstream network read timeout (2.0s exceeded) calling `inventory-service`.
+
+**Ask me: "Explain what caused the valuation timeout."** or check the **DevOps Suggestion Hub** tab for complete details.
+"""
+                                else: # brute_force
+                                    answer = f"""### 🛡️ Active Security Incident Detected
+
+There is an active simulated anomaly: **Brute-Force Login Security Alert**.
+Your query *"{query_to_run}"* does not specifically target this issue, but here is the quick diagnostic summary:
+
+- **Affected Service**: `auth-service` / `gateway`
+- **Current Status**: Throwing security alerts and activating auth throttles.
+- **Root Cause**: Multiple failed login attempts (5+) detected on user `admin` within 60 seconds.
+
+**Ask me: "Show all security warnings or failed logins."** or check the **Operational Console** tab for complete details.
+"""
+                            else:
+                                citations = relevant_logs[-5:] if relevant_logs else []
+                                answer = """
 ### AutoHub Operations Summary
 
 All systems are reporting healthy. 
@@ -2125,12 +3125,35 @@ If you are currently troubleshooting an incident, please select an anomaly scena
                 
                 st.markdown(answer)
                 if citations:
-                    with st.expander("📚 Cited Source Logs"):
-                        for cit in citations:
-                            color = "red" if cit["level"] == "ERROR" else ("orange" if cit["level"] == "WARNING" else "green")
-                            st.markdown(f"**[{cit['timestamp']}]** `:{color}[{cit['level']}]` **{cit['service']}**: {cit['message']}")
+                    cit_rows = ""
+                    for cit in citations:
+                        level = cit.get("level", "INFO")
+                        lvl_color = "#10b981"
+                        if level in ["ERROR", "CRITICAL"]:
+                            lvl_color = "#ef4444"
+                        elif level == "WARNING":
+                            lvl_color = "#fbbf24"
                             
+                        cit_rows += f"""
+                        <div class="chat-citation-row">
+                            <span class="chat-citation-time">[{cit.get('timestamp')}]</span>
+                            <span class="chat-citation-level" style="background:{lvl_color}18; color:{lvl_color}; border:1px solid {lvl_color}30;">{level}</span>
+                            <span class="chat-citation-service">{cit.get('service')}</span>:
+                            <span class="chat-citation-msg">{cit.get('message')}</span>
+                        </div>
+                        """
+                    
+                    st.markdown(f"""
+                    <div class="chat-citation-header">
+                        <div class="chat-citation-title"><i class="fa-solid fa-database"></i> Cited Source Telemetry</div>
+                        <div class="chat-citation-console">
+                            {cit_rows}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
                 st.session_state.messages.append({"role": "assistant", "content": answer, "citations": citations})
+                st.markdown("</div></div>", unsafe_allow_html=True)
 
 
 # Start the background simulator thread after all functions and variables are loaded
