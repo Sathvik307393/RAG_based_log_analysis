@@ -7,45 +7,47 @@ from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-# Retrieve configuration
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
-AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
-CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.3-chat")
-EMBEDDING_DEPLOYMENT = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-large")
-
-AZURE_SEARCH_ENDPOINT = os.getenv("AZURE_SEARCH_SERVICE_ENDPOINT")
-AZURE_SEARCH_ADMIN_KEY = os.getenv("AZURE_SEARCH_ADMIN_KEY")
-AZURE_SEARCH_INDEX_NAME = os.getenv("AZURE_SEARCH_INDEX_NAME", "devops-logs-index")
-
+# Configuration is retrieved dynamically during instantiation to avoid cached imports
 class LogRageEngine:
     def __init__(self):
+        # Retrieve Azure OpenAI Credentials
+        api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+        chat_deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-5.3-chat")
+        self.embedding_deployment = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "text-embedding-3-large")
+
+        # Retrieve Azure AI Search Credentials
+        search_endpoint = os.getenv("AZURE_SEARCH_SERVICE_ENDPOINT")
+        search_admin_key = os.getenv("AZURE_SEARCH_ADMIN_KEY")
+        search_index_name = os.getenv("AZURE_SEARCH_INDEX_NAME", "devops-logs-index")
+
         # Initialize Azure OpenAI Client for Embeddings
         self.openai_client = AzureOpenAI(
-            api_key=AZURE_OPENAI_API_KEY,
-            api_version=AZURE_OPENAI_API_VERSION,
-            azure_endpoint=AZURE_OPENAI_ENDPOINT
+            api_key=api_key,
+            api_version=api_version,
+            azure_endpoint=endpoint
         )
         
         # Initialize LangChain Azure OpenAI Client for Chat Synthesis
         self.chat_model = AzureChatOpenAI(
-            azure_deployment=CHAT_DEPLOYMENT,
-            api_key=AZURE_OPENAI_API_KEY,
-            azure_endpoint=AZURE_OPENAI_ENDPOINT,
-            api_version=AZURE_OPENAI_API_VERSION,
+            azure_deployment=chat_deployment,
+            api_key=api_key,
+            azure_endpoint=endpoint,
+            api_version=api_version,
             temperature=0.1
         )
         
         # Initialize Search Client
         self.search_client = SearchClient(
-            endpoint=AZURE_SEARCH_ENDPOINT,
-            index_name=AZURE_SEARCH_INDEX_NAME,
-            credential=AzureKeyCredential(AZURE_SEARCH_ADMIN_KEY)
+            endpoint=search_endpoint,
+            index_name=search_index_name,
+            credential=AzureKeyCredential(search_admin_key)
         )
         
     def _get_embedding(self, text: str) -> list:
         response = self.openai_client.embeddings.create(
-            model=EMBEDDING_DEPLOYMENT,
+            model=self.embedding_deployment,
             input=text
         )
         return response.data[0].embedding
