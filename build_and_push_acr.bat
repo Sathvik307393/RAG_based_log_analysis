@@ -42,5 +42,4 @@ call az acr build --registry %ACR_NAME% --image autohub-insurance-service:latest
 rem 9. Metrics Service
 echo Building metrics-service...
 call az acr build --registry %ACR_NAME% --image autohub-metrics-service:latest -f services/metrics-service/Dockerfile services/metrics-service/
-
 echo Done! All images built and pushed via ACR.
