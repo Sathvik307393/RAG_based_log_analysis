@@ -37,19 +37,19 @@ variable "eventhub_name" {
 variable "openai_name" {
   type        = string
   description = "The name of the Azure OpenAI Service."
-  default     = "log-analysis-openai-sre-v4"
+  default     = "log-analysis-openai-sre-v5"
 }
 
 variable "search_name" {
   type        = string
   description = "The name of the Azure AI Search Service."
-  default     = "log-analysis-search-sre-v4"
+  default     = "log-analysis-search-sre-v5"
 }
 
 variable "function_app_name" {
   type        = string
   description = "The name of the Linux Function App."
-  default     = "log-analysis-functions-sre-v4"
+  default     = "log-analysis-functions-sre-v5"
 }
 
 variable "aks_name" {
